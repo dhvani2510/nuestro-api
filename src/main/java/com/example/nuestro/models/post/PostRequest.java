@@ -4,9 +4,10 @@ public class PostRequest
 {
     private  String content;
 
-    public PostRequest(String content) {
-        this.content=content;
-    }
+    public PostRequest(){}
+//    public PostRequest(String content) {
+//        this.content=content;
+//    }
 
     public String getContent() {
         return content;

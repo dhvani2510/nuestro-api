@@ -1,6 +1,7 @@
 package com.example.nuestro.entities;
 
 import jakarta.annotation.Nullable;
+import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 
 import java.time.LocalDateTime;
@@ -10,34 +11,37 @@ import java.time.LocalDateTime;
 public abstract class BaseEntity {
 
      //public UUID Id;
-     protected LocalDateTime CreatedAt;
+     @Column(name = "created_at")
+     protected LocalDateTime createdAt;
+     @Column(name = "deleted_at")
      @Nullable
-     protected LocalDateTime DeletedAt;
-     protected Long CreatorId;
+     protected LocalDateTime deletedAt;
+     @Column(name = "creator_id")
+     protected String creatorId;
 
      public LocalDateTime getCreatedAt() {
-          return CreatedAt;
+          return createdAt;
      }
 
      public void setCreatedAt(LocalDateTime createdAt) {
-          CreatedAt = createdAt;
+          this.createdAt = createdAt;
      }
 
      @Nullable
      public LocalDateTime getDeletedAt() {
-          return DeletedAt;
+          return deletedAt;
      }
 
      public void setDeletedAt(@Nullable LocalDateTime deletedAt) {
-          DeletedAt = deletedAt;
+          this.deletedAt = deletedAt;
      }
 
-     public Long getCreatorId() {
-          return CreatorId;
+     public String getCreatorId() {
+          return creatorId;
      }
 
-     public void setCreatorId(Long creatorId) {
-          CreatorId = creatorId;
+     public void setCreatorId(String creatorId) {
+          this.creatorId = creatorId;
      }
 
 //     @SequenceGenerator(

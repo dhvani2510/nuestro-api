@@ -2,6 +2,7 @@ package com.example.nuestro.controllers;
 
 import com.example.nuestro.models.ResponseModel;
 import com.example.nuestro.models.users.ProfileRequest;
+import com.example.nuestro.models.users.UpdateDatabaseRequest;
 import com.example.nuestro.services.UserService;
 import com.example.nuestro.shared.exceptions.NuestroException;
 import org.slf4j.Logger;
@@ -54,6 +55,23 @@ public class UserController {
         try{
             var user= userService.UpdateProfile(profileRequest);
             return ResponseModel.Ok("Profile updated successfully", user);
+        }
+        catch (NuestroException e){
+            logger.error(e.getMessage(),e);
+            return ResponseModel.Fail(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+        catch (Exception e){
+            logger.error(e.getMessage(),e);
+            return  ResponseModel.Fail("Error occured", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("database")
+    public ResponseEntity<ResponseModel> UpdateDatabase(@RequestBody UpdateDatabaseRequest updateDatabaseRequest)
+    {
+        try{
+            var user= userService.UpdateDatabase(updateDatabaseRequest);
+            return ResponseModel.Ok("Database settings updated successfully", user);
         }
         catch (NuestroException e){
             logger.error(e.getMessage(),e);

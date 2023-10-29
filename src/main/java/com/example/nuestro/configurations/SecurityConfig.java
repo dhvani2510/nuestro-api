@@ -35,7 +35,7 @@ public class SecurityConfig {
             "/swagger-ui/swagger-initializer.js",
             "swagger-ui/index.html",
             "/v3/api-docs/**",
-            "/api/v1/files/**"
+            //"/api/v1/files/**"
     };
 
     @Bean
@@ -43,16 +43,16 @@ public class SecurityConfig {
     throws  Exception {
 
         logger.info("Filter chain is executing");
-//        httpSecurity
-//                .headers(h->h.disable())
-//                .csrf(csrf->csrf.disable())
-//                .authorizeHttpRequests(requests->
-//                        requests.requestMatchers( AUTH_WHITELIST).permitAll()
-//                                .anyRequest().authenticated())
-//                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-//                .authenticationProvider(AuthenticationProvider)
-//                .addFilterBefore(JwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-//                 ;
+        httpSecurity
+                .headers(h->h.disable())
+                .csrf(csrf->csrf.disable())
+                .authorizeHttpRequests(requests->
+                        requests.requestMatchers( AUTH_WHITELIST).permitAll()
+                                .anyRequest().authenticated())
+                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authenticationProvider(AuthenticationProvider)
+                .addFilterBefore(JwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                 ;
         //.httpBasic(Customizer.withDefaults())
         return httpSecurity.build();
     }

@@ -29,16 +29,17 @@ public class JwtService
         return ExtractClain(jwtToken, Claims::getExpiration);
     }
 
-    public Long ExtractId(String jwtToken) {
+    public String ExtractId(String jwtToken) {
         var id= ExtractClain(jwtToken, Claims::getId);
-        return parseLong(id);
+        //return parseLong(id);
+        return id;
     }
 
     public  String GenerateToken( @NotNull Map<String,Object> extraClaims, @NotNull User user){
 
         return Jwts.builder().setClaims(extraClaims)
-                .setIssuer("Nuestro.com")
-                .setId(user.id.toString())
+                .setIssuer("nuestro.iverique.com")
+                .setId(user.id)
                 .setSubject(user.email)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration( new Date(System.currentTimeMillis() +1000*60 *60*24)) // 24 hours

@@ -7,12 +7,12 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 @Entity
-@Table
+@Table(name = "files")
 public class File extends  BaseEntity
 {
     @Id
     @GeneratedValue(strategy=GenerationType.UUID)
-    private String Id;
+    private String id;
     private String name ;
     private String contentType ;// Image, Audio, Video
     @Column(length = 10485760 ) //10MB
@@ -36,11 +36,11 @@ public class File extends  BaseEntity
     }
 
     public String getId() {
-        return Id;
+        return id;
     }
 
     public void setId(String id) {
-        Id = id;
+        this.id = id;
     }
 
     public String getName() {

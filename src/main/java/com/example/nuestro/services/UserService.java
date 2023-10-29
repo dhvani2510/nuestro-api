@@ -2,7 +2,6 @@ package com.example.nuestro.services;
 
 import com.example.nuestro.configurations.JwtService;
 import com.example.nuestro.entities.User;
-import com.example.nuestro.entities.datatypes.DatabaseType;
 import com.example.nuestro.entities.datatypes.Role;
 import com.example.nuestro.models.UserModel;
 import com.example.nuestro.models.auth.AuthenticationRequest;
@@ -11,6 +10,7 @@ import com.example.nuestro.models.auth.RegisterRequest;
 import com.example.nuestro.models.auth.RegisterResponse;
 import com.example.nuestro.models.users.ProfileRequest;
 import com.example.nuestro.models.users.ProfileResponse;
+import com.example.nuestro.models.users.UpdateDatabaseRequest;
 import com.example.nuestro.repositories.UserRepository;
 import com.example.nuestro.shared.exceptions.NuestroException;
 import org.slf4j.Logger;
@@ -34,25 +34,30 @@ public class UserService {
     private  final JwtService jwtService;
     private  final AuthenticationManager authenticationManager;
     private  final PasswordEncoder passwordEncoder;
-    private  final  FileService fileService;
+
+    private  final ClientDatabaseService clientService;
 
     private static final Logger logger= LoggerFactory.getLogger(UserService.class);
 
     @Autowired
-    public  UserService(UserRepository userRepository, JwtService jwtService, AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, FileService fileService){
+    public  UserService(UserRepository userRepository, JwtService jwtService, AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, ClientDatabaseService clientService){
         this.userRepository=userRepository;
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
         this.passwordEncoder = passwordEncoder;
-        this.fileService = fileService;
+        this.clientService = clientService;
     }
-    public List<UserModel> GetUsers(){
+//    public List<UserModel> GetUsers(){
+//
+//        List<User> users= userRepository.findAll();
+//        List<UserModel> result = users.stream()
+//                .map(u -> new UserModel(u))
+//                .toList();
+//        return result;
+//    }
+    public List<User> GetUsers(){
 
-        List<User> users= userRepository.findAll();
-        List<UserModel> result = users.stream()
-                .map(u -> new UserModel(u))
-                .toList();
-        return result;
+        return userRepository.findAll();
     }
 
     public  UserModel GetProfile(String id) throws NuestroException {
@@ -99,6 +104,56 @@ public class UserService {
        return new ProfileResponse(user);
      }
 
+    public ProfileResponse UpdateDatabase(UpdateDatabaseRequest updateDatabaseRequest) throws Exception {
+
+        logger.info("User is updating database connection");
+        if(StringIsNullOrEmpty(updateDatabaseRequest.getDatabase()))
+            throw new NuestroException("Database is empty");
+        if(StringIsNullOrEmpty(updateDatabaseRequest.getServer()))
+            throw new NuestroException("Server is empty");
+        if(StringIsNullOrEmpty(updateDatabaseRequest.getPort()))
+            throw new NuestroException("Port is null");
+
+        logger.info("Getting user profile from context");
+        var auth= SecurityContextHolder.getContext().getAuthentication();
+        if(!auth.isAuthenticated()){
+            var details= auth.getDetails();
+            logger.error("User {} is not authenticated", details);
+            throw new NuestroException("user is not authenticated");
+        }
+        var user = userRepository.findByEmail(auth.getName())
+                .orElseThrow(()-> new NuestroException("User not found")); // name should contain the enail
+        //var user= (User)auth.getPrincipal();//var user= userRepository.findById(((User)auth.getPrincipal()))
+
+
+        // check if connection is begin made to the database
+
+        if(true){
+            throw  new NuestroException("Failed to connect to database");
+        }
+        user.Update(updateDatabaseRequest);
+
+        var clientDatabase= clientService.getDatabase(user);
+        clientDatabase.updateUser(user);
+
+        userRepository.save(user); //synchornize
+
+        logger.info("Database updated");
+        return new ProfileResponse(user);
+    }
+
+    public  void Delete(String id) throws Exception {
+        logger.info("User deleting post {}",id);
+        var user= userRepository.findById(id)
+                .orElseThrow(()-> new NuestroException("User not find"));
+        //post.setDeletedAt(LocalDateTime.now()) ; postRepository.save(post);
+
+        var clientDatabase= clientService.getDatabase(user);
+        clientDatabase.deleteUser(user.id);
+        userRepository.delete(user); //Synchonize
+        logger.info("User deleted successfully");
+    }
+
     public  UserModel GetUser() throws NuestroException {
         var user=GetUserContext();
 //        var u= userRepository.findById(user.Id)
@@ -106,8 +161,13 @@ public class UserService {
         if(user== null)
             throw  new NuestroException("User not found");
 
-        var result= new UserModel(user);
-        return result;
+        return new UserModel(user);
+    }
+
+    public  User GetUser(String id) throws NuestroException {
+
+        return userRepository.findById(id)
+                .orElseThrow(()-> new NuestroException("User not found"));
     }
 
     public  User GetUserContext() throws NuestroException {
@@ -122,7 +182,7 @@ public class UserService {
         return (User)auth.getPrincipal();
     }
 
-    public  User GetUserInstance() throws NuestroException {
+    public  User GetUserContextInstance() throws NuestroException {
         var user= GetUserContext();
         return userRepository.findById(user.id)
                 .orElseThrow(()-> new NuestroException("User not found"));

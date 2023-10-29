@@ -5,7 +5,7 @@ import java.util.Base64;
 
 public class EncryptionHelper {
 
-    private static final String SECRET_KEY = "your_secret_key"; // Replace with your own secret key
+    private static final String SECRET_KEY = "KZunWsrbjLyjGwvq"; // Replace with your own secret key
 
     public static String encrypt(String plaintext) throws Exception {
         SecretKeySpec secretKey = new SecretKeySpec(SECRET_KEY.getBytes(), "AES");

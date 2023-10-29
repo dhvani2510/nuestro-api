@@ -18,13 +18,14 @@ public class PostService
 {
     private  final PostRepository postRepository;
     private  final  UserService userService;
-
+    private  final ClientDatabaseService clientService;
     private static final Logger logger= LoggerFactory.getLogger(PostService.class);
     @Autowired
-    public PostService(PostRepository postRepository, UserService userService){
+    public PostService(PostRepository postRepository, UserService userService, ClientDatabaseService clientService){
 
         this.postRepository = postRepository;
         this.userService = userService;
+        this.clientService = clientService;
     }
 
     public List<PostResponse> GetPosts(){
@@ -42,32 +43,29 @@ public class PostService
         return  new PostResponse(post);
     }
 
-    public  PostResponse CreatePost(PostRequest postRequest) throws NuestroException {
-        logger.info("User adding post with content {}"
-                , postRequest.getContent());
+    public  PostResponse CreatePost(PostRequest postRequest) throws Exception {
+        logger.info("User adding post with content {}",postRequest.getContent());
 
         ValidatePostRequest(postRequest);
 
-//        var post= postRepository.findByEnglishAndHindiAndFrench(postRequest.getEnglish(),postRequest.getHindi(),postRequest.getFrench());
-//        if(post!=null){
-//            logger.error("Post already exists");
-//            throw  new NuestroException("Post already exists");
-//        }
-
-        var user= userService.GetUserContext();
+        var user= userService.GetUserContextInstance();
         if(user==null){
             logger.error("User not found");
             throw  new NuestroException("User not found");
         }
+
         var post= new Post(postRequest.getContent(),user);
 
-        postRepository.save(post);
+        //jdbcTemplate.setDataSource(userDataSource);
+
+        var clientDatabase= clientService.getDatabase(user);
+        clientDatabase.addPost(post);
+        postRepository.save(post); // Synchronize
         return  new PostResponse(post);
     }
 
-    public  PostResponse UpdatePost(String id, PostRequest postRequest) throws NuestroException {
-        logger.info("User updating post {} with content {}"
-            ,id, postRequest.getContent());
+    public  PostResponse UpdatePost(String id, PostRequest postRequest) throws Exception {
+        logger.info("User updating post {} with content {}" ,id, postRequest.getContent());
 
         ValidatePostRequest(postRequest);
 
@@ -75,21 +73,44 @@ public class PostService
                 .orElseThrow(()-> new NuestroException("Post not find"));
 
         post.Set(postRequest);
-        postRepository.save(post);
+        var user= userService.GetUser(post.getUser().id);
+        var clientDatabase= clientService.getDatabase(user);
+        clientDatabase.updatePost(post);
+        postRepository.save(post);//synchonize
         return new PostResponse(post);
     }
 
-    public  void Delete(String id) throws NuestroException {
+    public  void Delete(String id) throws Exception {
         logger.info("User deleting post {}",id);
         var post= postRepository.findById(id)
                 .orElseThrow(()-> new NuestroException("Post not find"));
         //post.setDeletedAt(LocalDateTime.now()) ; postRepository.save(post);
-        postRepository.delete(post);
+       //clientService.deletePost(post.getId());
+        var user= userService.GetUser(post.getUser().id);
+        var clientDatabase= clientService.getDatabase(user);
+        clientDatabase.deletePost(post.getId());
+        postRepository.delete(post); //Synchonize
         logger.info("Post deleted successfully");
     }
 
     private  void ValidatePostRequest(PostRequest postRequest) throws NuestroException {
         if(StringHelper.StringIsNullOrEmpty(postRequest.getContent()))
             throw  new NuestroException("Content is empty");
+    }
+
+
+//    private void addUser(User user, JdbcTemplate jdbcTemplate) {
+//        String sql = "INSERT INTO users (id,created_at, creator_id, content, user_id) VALUES (?, ?, ?, ?, ?)";
+//        jdbcTemplate.update(sql, user.getId(), user.getCreatedAt(), user.getCreatorId(), user.getContent(), post.getUser().id);
+//    }
+    //Add the number of reads over time? Big Long,
+    public void synchronizeData() throws Exception { // Get users, for each, get data verify and
+
+//        var users= userService.GetUsers();
+//
+//        for (var user : users) {
+//            var posts= postRepository.findByUserId(user.id);
+//            clientService.AddToClientDatabase(user, posts);
+//        }
     }
 }
