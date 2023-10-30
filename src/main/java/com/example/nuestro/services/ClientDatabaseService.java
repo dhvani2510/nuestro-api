@@ -2,6 +2,7 @@ package com.example.nuestro.services;
 
 import com.example.nuestro.entities.User;
 import com.example.nuestro.entities.datatypes.DatabaseType;
+import com.example.nuestro.services.interfaces.IClientDatabase;
 import com.example.nuestro.shared.exceptions.NuestroException;
 import com.example.nuestro.shared.helpers.DatabaseHelper;
 import org.slf4j.Logger;
@@ -34,10 +35,20 @@ public class ClientDatabaseService
             ///var result= isConnectionValid();
         }
         else  if(user.getDatabaseType()==DatabaseType.MONGODB){
-            var mongoClient =DatabaseHelper .createMongoClient(user);
-                    //.createMongoClient(user.getConnectionString());
+            var mongoClient =DatabaseHelper
+                    //.createMongoClient(user);
+            .createMongoClient(user.getConnectionString());
             var mongoTemplate= new MongoTemplate(mongoClient, user.getDbDatabase());
             return new ClientMongoDbService(mongoTemplate);
+        }
+        else  if(user.getDatabaseType()==DatabaseType.MSSQL){
+            var mssqlDataSource =DatabaseHelper.createMSSQLDataSource(user.getConnectionString());
+
+            var sqlTemplate= new JdbcTemplate(mssqlDataSource);
+            return new ClientMSSQLService(sqlTemplate);
+        }
+        else if(user.getDatabaseType()==DatabaseType.None){
+            return null;
         }
         else {
             throw  new NuestroException("Database type not supported");

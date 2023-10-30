@@ -2,12 +2,11 @@ package com.example.nuestro.entities;
 
 import com.example.nuestro.entities.datatypes.DatabaseType;
 import com.example.nuestro.entities.datatypes.Role;
+import com.example.nuestro.entities.interfaces.IUser;
 import com.example.nuestro.models.users.UpdateDatabaseRequest;
 import com.example.nuestro.shared.helpers.DatabaseHelper;
 import com.example.nuestro.shared.helpers.EncryptionHelper;
 import jakarta.persistence.*;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,24 +19,22 @@ import java.util.List;
 
 @Entity
 @Table(name = "users")
-//@Document(collection = "users")
-public class User extends  BaseEntity implements UserDetails
+public class User extends  BaseEntity implements UserDetails, IUser
 {
     @Id
     //@GeneratedValue(strategy=GenerationType.IDENTITY)
-    //@Indexed(unique=true)
     @GeneratedValue(strategy=GenerationType.UUID)
-    public String id;
+    private String id;
     @Column(name = "first_name")
-    public  String firstName;
+    private  String firstName;
     @Column(name = "last_name")
-    public  String lastName;
+    private   String lastName;
     @Column(name = "birth_date")
-    public LocalDate birthDate;
+    private LocalDate birthDate;
     @Column(unique = true)
-    public  String email;
+    private   String email;
 
-    public  String password; // Hashed
+    private   String password; // Hashed
 
    // @OneToOne(cascade = CascadeType.PERSIST)
     //@Transient
@@ -47,17 +44,17 @@ public class User extends  BaseEntity implements UserDetails
     //@Column(name = "connection_string")
     private  String connectionString;
 
-    private  String db_server;
-    private  String db_port;
-    private String db_database;
-    private String db_username;
-    private  String db_password;
+    private  String dbServer;
+    private  String dbPort;
+    private String dbDatabase;
+    private String dbUsername;
+    private  String dbPassword;
 
     @Column(name = "database_type")
     @Enumerated(EnumType.STRING)
     private DatabaseType databaseType;
     @Transient
-    public Integer age;
+    private Integer age;
 
     @Enumerated(EnumType.STRING)
      private  Role role;
@@ -78,12 +75,12 @@ public class User extends  BaseEntity implements UserDetails
     }
 
     public  void Update (UpdateDatabaseRequest databaseRequest) throws Exception {
-        this.db_database= EncryptionHelper.encrypt( databaseRequest.getDatabase());
-        this.db_password= EncryptionHelper.encrypt(databaseRequest.getPassword());
-        this.db_port= EncryptionHelper.encrypt(databaseRequest.getPort());
-        this.db_server= EncryptionHelper.encrypt(databaseRequest.getServer());
-        this.db_username= EncryptionHelper.encrypt(databaseRequest.getUsername());
-        this.setDatabaseType(databaseRequest.getType());
+        this.dbDatabase = EncryptionHelper.encrypt( databaseRequest.getDatabase());
+        this.dbPassword = EncryptionHelper.encrypt(databaseRequest.getPassword());
+        this.dbPort = EncryptionHelper.encrypt(databaseRequest.getPort());
+        this.dbServer = EncryptionHelper.encrypt(databaseRequest.getServer());
+        this.dbUsername = EncryptionHelper.encrypt(databaseRequest.getUsername());
+        this.databaseType=(databaseRequest.getType());
     }
 
     public Integer getAge(){
@@ -95,6 +92,61 @@ public class User extends  BaseEntity implements UserDetails
     public String getEmail() {
         return email;
     }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    @Override
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    @Override
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    @Override
+    public LocalDate getBirthDate() {
+        if(birthDate==null)
+            return  LocalDate.now();
+        return birthDate;
+    }
+
+    public void setBirthDate(LocalDate birthDate) {
+        this.birthDate = birthDate;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setConnectionString(String connectionString) {
+        this.connectionString = connectionString;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
+    }
+
+    @Override
+    public Role getRole() {
+        return role;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));
@@ -165,73 +217,64 @@ public class User extends  BaseEntity implements UserDetails
     }
 
     public String getDbServer() throws Exception {
-        return EncryptionHelper.decrypt(db_server);
+        return EncryptionHelper.decrypt(dbServer);
     }
 
     public void setDbServer(String db_server) {
-        this.db_server = db_server;
+        this.dbServer = db_server;
     }
 
     public String getDbPort() throws Exception {
-        return EncryptionHelper.decrypt(db_port);
+        return EncryptionHelper.decrypt(dbPort);
     }
 
     public void setDbPort(String db_port) {
-        this.db_port = db_port;
+        this.dbPort = db_port;
     }
 
     public String getDbDatabase() throws Exception {
-        return EncryptionHelper.decrypt(db_database);
+        return EncryptionHelper.decrypt(dbDatabase);
     }
 
     public void setDbDatabase(String db_database) {
-        this.db_database = db_database;
+        this.dbDatabase = db_database;
     }
 
     public String getDbUsername() throws Exception {
-        return EncryptionHelper.decrypt(db_username);
+        return EncryptionHelper.decrypt(dbUsername);
     }
 
     public void setDbUsername(String db_username) {
-        this.db_username = db_username;
+        this.dbUsername = db_username;
     }
 
     public String getDbPassword() throws Exception {
-        return EncryptionHelper.decrypt(db_password);
+        return EncryptionHelper.decrypt(dbPassword);
     }
 
     public void setDbPassword(String db_password) {
-        this.db_password = db_password;
+        this.dbPassword = db_password;
     }
 
     public String getConnectionString() throws Exception {
-
-        return  databaseType== DatabaseType.MYSQL?
-                GetMySqlConnectionString():
-                databaseType== DatabaseType.MONGODB?
-                        GetMongoDbConnectionString():
-                        "";
+        return  GenerateConnectionString(databaseType);
     }
 
-    private String GetMySqlConnectionString() throws Exception { var server= getDbServer();
-        var port= Integer.parseInt(getDbPort());
-        var database= getDbDatabase();
-        var username= getDbUsername();
-        var password= getDbPassword();
-        return DatabaseHelper.GenerateMySQLConnectionString(server,
-                port, database, username,password);
+    private String GenerateConnectionString(DatabaseType databaseType) throws Exception {
+        var server = getDbServer();
+        var port = Integer.parseInt(getDbPort());
+        var database = getDbDatabase();
+        var username = getDbUsername();
+        var password = getDbPassword();
 
-    }
-
-    private String GetMongoDbConnectionString() throws Exception {
-        var server= getDbServer();
-        var port= Integer.parseInt(getDbPort());
-        var database= getDbDatabase();
-        var username= getDbUsername();
-        var password= getDbPassword();
-        return DatabaseHelper.GenerateMongoDBURI(server,
-                port, database, username,password);
-
+        return switch (databaseType) {
+            case MYSQL -> DatabaseHelper.GenerateMySQLConnectionString(server, port, database, username, password);
+            case MONGODB -> DatabaseHelper.GenerateMongoDBURI(server, port, database, username, password);
+                   // DatabaseHelper.GenerateMongoDBURI(server, port, database, username, password);
+            case MSSQL -> DatabaseHelper.GenerateMSSQLConnectionString(server, port, database, username, password);
+            default -> "";
+            //throw new IllegalArgumentException("Unsupported database type: " + databaseType);
+        };
     }
 
 

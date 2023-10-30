@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 //Initializer
 @Configuration
@@ -43,8 +44,8 @@ public class UserConfig {
                 ives.setRole(Role.Admin);
 
                 AddUser(userRepository, clientService, ives);
-                //ives.id= UUID.randomUUID().toString();
-                ives.email="test@test.com";
+                ives.setId( UUID.randomUUID().toString());
+                ives.setEmail("test@test.com");
                 ives.Update(GetMongoDbDatabase());
                 AddUser(userRepository,clientService,ives);
             }
@@ -55,7 +56,7 @@ public class UserConfig {
     }
 
     private static void AddUser(UserRepository userRepository, ClientDatabaseService clientService, User ives) throws Exception {
-        var existingIves= userRepository.findByEmail(ives.email);
+        var existingIves= userRepository.findByEmail(ives.getEmail());
         if(existingIves.isEmpty()){
             userRepository.saveAll(List.of(ives));
            var clientDatabase= clientService.getDatabase(ives);
@@ -65,10 +66,10 @@ public class UserConfig {
     }
 
     private  UpdateDatabaseRequest GetMongoDbDatabase(){
-        String server ="localhost"; //iverique.com
+        String server ="iverique.com"; //iverique.com
         var database="nuestro";
-        String username="";
-        String password="";
+        String username="root";
+        String password="ThisIsAStrongPassword!";
         var port="27017";
         return new UpdateDatabaseRequest(server,port,database,username,password, DatabaseType.MONGODB);
     }

@@ -1,5 +1,6 @@
 package com.example.nuestro.entities;
 
+import com.example.nuestro.entities.interfaces.IPost;
 import com.example.nuestro.models.post.PostRequest;
 import jakarta.persistence.*;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -11,7 +12,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "posts")
 //@Document(collection = "posts")
-public class Post extends  BaseEntity
+public class Post extends  BaseEntity  implements IPost
 {
     @Id
     //@Indexed(unique=true)
@@ -25,7 +26,7 @@ public class Post extends  BaseEntity
     public Post() {}
     public Post(String content, User user) {
         this.id= UUID.randomUUID().toString();
-        this.setCreatorId(user.id);
+        this.setCreatorId(user.getId());
         this.content = content;
         this.user= user;
         this.setCreatedAt(LocalDateTime.now());

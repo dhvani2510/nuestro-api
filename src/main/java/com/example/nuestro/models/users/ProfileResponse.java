@@ -48,10 +48,10 @@ public class ProfileResponse
 
     public ProfileResponse(User user)
     {
-        this.firstName = user.firstName;
-        this.lastName = user.lastName;
+        this.firstName = user.getFirstName();
+        this.lastName = user.getLastName();
         //this.image = StringHelper.GetFileUrl(user.getImageId());
-        this.birthDate = user.birthDate;
+        this.birthDate = user.getBirthDate();
         //this.getDatabaseType=user.getDatabaseType();
     }
 

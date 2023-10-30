@@ -2,6 +2,7 @@ package com.example.nuestro.services;
 
 import com.example.nuestro.configurations.JwtService;
 import com.example.nuestro.entities.User;
+import com.example.nuestro.entities.datatypes.DatabaseType;
 import com.example.nuestro.entities.datatypes.Role;
 import com.example.nuestro.models.UserModel;
 import com.example.nuestro.models.auth.AuthenticationRequest;
@@ -47,15 +48,15 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
         this.clientService = clientService;
     }
-//    public List<UserModel> GetUsers(){
-//
-//        List<User> users= userRepository.findAll();
-//        List<UserModel> result = users.stream()
-//                .map(u -> new UserModel(u))
-//                .toList();
-//        return result;
-//    }
-    public List<User> GetUsers(){
+    public List<UserModel> GetUsers(){
+
+        List<User> users= userRepository.findAll();
+        List<UserModel> result = users.stream()
+                .map(u -> new UserModel(u))
+                .toList();
+        return result;
+    }
+    public List<User> GetAllUsers(){
 
         return userRepository.findAll();
     }
@@ -87,9 +88,9 @@ public class UserService {
        //var user= (User)auth.getPrincipal();//var user= userRepository.findById(((User)auth.getPrincipal()))
 
        if(profileRequest.getBirthDate()!=null)
-           user.birthDate = profileRequest.getBirthDate();
-       user.firstName= profileRequest.getFirstName();
-       user.lastName= profileRequest.getLastName();
+           user.setBirthDate( profileRequest.getBirthDate());
+       user.setFirstName(profileRequest.getFirstName());
+       user.setLastName( profileRequest.getLastName());
 //       if(profileRequest.getDatabaseType()== DatabaseType.)
 //           throw new NuestroException("Secondary language cannot be set to english");
 
@@ -126,14 +127,16 @@ public class UserService {
         //var user= (User)auth.getPrincipal();//var user= userRepository.findById(((User)auth.getPrincipal()))
 
 
-        // check if connection is begin made to the database
-
-        if(true){
-            throw  new NuestroException("Failed to connect to database");
-        }
         user.Update(updateDatabaseRequest);
-
         var clientDatabase= clientService.getDatabase(user);
+        //clientDatabase.doesDatabaseExist(user.getDbDatabase());
+        if(!clientDatabase.isConnectionValid()){
+            throw  new NuestroException("Failed to connect to database. Check if database is created");
+        }
+        else{
+            clientDatabase.createDatabaseAndTables(user.getDbDatabase());
+        }
+
         clientDatabase.updateUser(user);
 
         userRepository.save(user); //synchornize
@@ -149,7 +152,7 @@ public class UserService {
         //post.setDeletedAt(LocalDateTime.now()) ; postRepository.save(post);
 
         var clientDatabase= clientService.getDatabase(user);
-        clientDatabase.deleteUser(user.id);
+        clientDatabase.deleteUser(user.getId());
         userRepository.delete(user); //Synchonize
         logger.info("User deleted successfully");
     }
@@ -184,7 +187,7 @@ public class UserService {
 
     public  User GetUserContextInstance() throws NuestroException {
         var user= GetUserContext();
-        return userRepository.findById(user.id)
+        return userRepository.findById(user.getId())
                 .orElseThrow(()-> new NuestroException("User not found"));
     }
 
@@ -208,7 +211,7 @@ public class UserService {
 
         if(!existinguser.isEmpty())
         {
-            logger.error("User {} already exits", existinguser.get().email );
+            logger.error("User {} already exits", existinguser.get().getEmail() );
             throw new NuestroException("User exists already");
         }
         var hashedPassword= //hashWith256(registerRequest.getPassword());
@@ -219,9 +222,10 @@ public class UserService {
                 .setRole(Role.User)
                 .build();
 
+        user.setDatabaseType(DatabaseType.None);
         userRepository.save(user);
 
-        var response= new RegisterResponse(user.id,user.email,user.firstName, user.lastName);
+        var response= new RegisterResponse(user.getId(),user.getEmail(),user.getFirstName(), user.getLastName());
         return  response;
     }
 

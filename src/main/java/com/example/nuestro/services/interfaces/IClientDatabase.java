@@ -1,4 +1,4 @@
-package com.example.nuestro.services;
+package com.example.nuestro.services.interfaces;
 
 import com.example.nuestro.entities.Post;
 import com.example.nuestro.entities.User;
@@ -22,5 +22,6 @@ public interface IClientDatabase
     void deleteUser(String userId);
     void createDatabaseAndTables(String databaseName);
     boolean doesTableExist(String tableName);
+    boolean doesDatabaseExist(String databaseName);
     void AddToClientDatabase(User user, List<Post> posts) throws Exception;
 }

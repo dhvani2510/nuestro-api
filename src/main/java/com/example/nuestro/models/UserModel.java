@@ -29,11 +29,11 @@ public class UserModel {
         this.image= StringHelper.GetFileUrl(imageId);
     }
     public  UserModel(User user)
-    {   this.id = user.id;
-        this.firstName= user.firstName;
-        this.lastName= user.lastName;
+    {   this.id = user.getId();
+        this.firstName= user.getFirstName();
+        this.lastName= user.getLastName();
         this.email=user.getEmail();
-        this.birthDate = user.birthDate;
+        this.birthDate = user.getBirthDate();
         this.age = age==null? getAge(birthDate): age;
         //this.image= StringHelper.GetFileUrl(user.getImageId());
         this.databaseType=user.getDatabaseType();

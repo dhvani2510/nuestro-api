@@ -1,5 +1,6 @@
 package com.example.nuestro.entities;
 
+import com.example.nuestro.entities.interfaces.IUser;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
@@ -8,7 +9,7 @@ import java.time.LocalDateTime;
 
 @MappedSuperclass
 
-public abstract class BaseEntity {
+public abstract class BaseEntity{
 
      //public UUID Id;
      @Column(name = "created_at")

@@ -1,6 +1,7 @@
 package com.example.nuestro.services;
 
 import com.example.nuestro.entities.Post;
+import com.example.nuestro.entities.datatypes.DatabaseType;
 import com.example.nuestro.models.post.PostRequest;
 import com.example.nuestro.models.post.PostResponse;
 import com.example.nuestro.repositories.PostRepository;
@@ -11,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.xml.crypto.Data;
 import java.util.List;
 
 @Service
@@ -58,8 +60,10 @@ public class PostService
 
         //jdbcTemplate.setDataSource(userDataSource);
 
-        var clientDatabase= clientService.getDatabase(user);
-        clientDatabase.addPost(post);
+        if(user.getDatabaseType()!= DatabaseType.None){
+            var clientDatabase= clientService.getDatabase(user);
+            clientDatabase.addPost(post);
+        }
         postRepository.save(post); // Synchronize
         return  new PostResponse(post);
     }
@@ -73,9 +77,11 @@ public class PostService
                 .orElseThrow(()-> new NuestroException("Post not find"));
 
         post.Set(postRequest);
-        var user= userService.GetUser(post.getUser().id);
-        var clientDatabase= clientService.getDatabase(user);
-        clientDatabase.updatePost(post);
+        if(post.getUser().getDatabaseType()!= DatabaseType.None){
+            var user= userService.GetUser(post.getUser().getId());
+            var clientDatabase= clientService.getDatabase(user);
+            clientDatabase.updatePost(post);
+        }
         postRepository.save(post);//synchonize
         return new PostResponse(post);
     }
@@ -86,7 +92,7 @@ public class PostService
                 .orElseThrow(()-> new NuestroException("Post not find"));
         //post.setDeletedAt(LocalDateTime.now()) ; postRepository.save(post);
        //clientService.deletePost(post.getId());
-        var user= userService.GetUser(post.getUser().id);
+        var user= userService.GetUser(post.getUser().getId());
         var clientDatabase= clientService.getDatabase(user);
         clientDatabase.deletePost(post.getId());
         postRepository.delete(post); //Synchonize

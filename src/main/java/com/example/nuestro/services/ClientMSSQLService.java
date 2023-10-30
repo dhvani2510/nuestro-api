@@ -4,7 +4,6 @@ import com.example.nuestro.entities.Post;
 import com.example.nuestro.entities.User;
 import com.example.nuestro.services.interfaces.IClientDatabase;
 import com.example.nuestro.shared.helpers.DatabaseHelper;
-import jdk.jshell.spi.ExecutionControl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -19,14 +18,14 @@ import java.sql.SQLException;
 import java.util.List;
 
 @Service
-public class ClientMySQLService implements IClientDatabase
+public class ClientMSSQLService implements IClientDatabase
 {
    // @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    private static final Logger logger= LoggerFactory.getLogger(ClientMySQLService.class);
-    public ClientMySQLService() {  }
-    public ClientMySQLService(JdbcTemplate jdbcTemplate) {
+    private static final Logger logger= LoggerFactory.getLogger(ClientMSSQLService.class);
+    public ClientMSSQLService() {  }
+    public ClientMSSQLService(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate= jdbcTemplate;
         //isConnectionValid();
     }
@@ -38,6 +37,7 @@ public class ClientMySQLService implements IClientDatabase
         ///var result= isConnectionValid();
     }
     public boolean isConnectionValid() {
+
         try {
             // Execute a ConnectionCallback to check the connection validity
             jdbcTemplate.execute(new ConnectionCallback<Void>() {
@@ -171,13 +171,25 @@ public class ClientMySQLService implements IClientDatabase
         jdbcTemplate.update(sql, userId);
     }
 
+    public void createDatabaseIfNotExists(String databaseName) {
+        // Check if the database exists
+        String checkExistsSQL = "SELECT 1 FROM sys.databases WHERE name = ?";
+        List<Integer> result = jdbcTemplate.queryForList(checkExistsSQL, Integer.class, databaseName);
+
+        if (result.isEmpty()) {
+            // The database does not exist, so create it
+            String createDatabaseSQL = "CREATE DATABASE " + databaseName;
+            jdbcTemplate.execute(createDatabaseSQL);
+        }
+    }
+
     public void createDatabaseAndTables(String databaseName) {
-        // Create the database if it doesn't exist
-        String createDatabaseSQL = "CREATE DATABASE IF NOT EXISTS `" + databaseName+"`";
-        jdbcTemplate.execute(createDatabaseSQL);
+        createDatabaseIfNotExists(databaseName);
+        //String createDatabaseSQL = "CREATE DATABASE IF NOT EXISTS [" + databaseName+"]";
+        //jdbcTemplate.execute(createDatabaseSQL);
 
         // Switch to the created database
-        String useDatabaseSQL = "USE `"+databaseName +"`";
+        String useDatabaseSQL = "USE ["+databaseName +"]";
         jdbcTemplate.execute(useDatabaseSQL);
 
         if(!doesTableExist("users")){
@@ -227,7 +239,30 @@ public class ClientMySQLService implements IClientDatabase
         }
     }
 
+    public boolean doesDatabaseExist(String databaseName) {
+        String sql = "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = ?";
+        try {
+            jdbcTemplate.queryForObject(sql, String.class, databaseName);
+            return true; // Database exists
+        }
+        catch (EmptyResultDataAccessException e) {
+            logger.error("Database does not exist");
+            return false; // Database does not exist
+        }
+    }
+
     public boolean doesTableExist(String tableName) {
+        String checkTableSQL = "IF OBJECT_ID('" + tableName + "', 'U') IS NOT NULL BEGIN END";
+
+        try {
+            jdbcTemplate.execute(checkTableSQL);
+            return true; // Table exists
+        } catch (Exception e) {
+            return false; // Table does not exist
+        }
+    }
+
+    public boolean doesTableExis2(String tableName) {
         String sql = "SELECT 1 FROM " + tableName + " LIMIT 1";
         try {
             jdbcTemplate.query(sql, (rs, rowNum) -> {
@@ -240,16 +275,10 @@ public class ClientMySQLService implements IClientDatabase
         }
     }
 
-    @Override
-    public boolean doesDatabaseExist(String databaseName) {
-     // throw  new  ExecutionControl.NotImplementedException("");
-        return false;
-    }
-
     public void AddToClientDatabase (User user, List<Post> posts) throws Exception {
         logger.info("Connecting to client database, creating user and posts");
         var connectionString = DatabaseHelper
-                .GenerateMySQLConnectionString(user.getDbServer(),
+                .GenerateMSSQLConnectionString(user.getDbServer(),
                         Integer.parseInt(user.getDbPort()),
                         user.getDbDatabase(),
                         user.getDbUsername(),
@@ -258,7 +287,7 @@ public class ClientMySQLService implements IClientDatabase
         //var post= new Post(postRequest.getContent(),user);
         //addPost(url, userame, password, postRequest.getContent(),post);
         // Create a data source using the user's connection information
-        DataSource userDataSource =DatabaseHelper.createMySQLDataSource(connectionString);
+        DataSource userDataSource =DatabaseHelper.createMSSQLDataSource(connectionString);
         //DatabaseHelper.createDataSource(url, username, password);
 
         var jdbcTemplate = new JdbcTemplate(userDataSource);

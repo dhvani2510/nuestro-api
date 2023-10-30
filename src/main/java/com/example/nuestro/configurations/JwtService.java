@@ -39,8 +39,8 @@ public class JwtService
 
         return Jwts.builder().setClaims(extraClaims)
                 .setIssuer("nuestro.iverique.com")
-                .setId(user.id)
-                .setSubject(user.email)
+                .setId(user.getId())
+                .setSubject(user.getEmail())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration( new Date(System.currentTimeMillis() +1000*60 *60*24)) // 24 hours
                 .signWith(getSigninKey(), SignatureAlgorithm.HS256)
@@ -58,8 +58,7 @@ public class JwtService
     public  boolean IsTokenValid(String jwtToken, @NotNull User user){
 
         final  String email= ExtractEmail(jwtToken);
-        var isTokenValid= (email.equals(user.email)) && !IsTokenExpired(jwtToken);
-        return isTokenValid;
+        return (email.equals(user.getEmail())) && !IsTokenExpired(jwtToken);
     }
 
     private boolean IsTokenExpired(String jwtToken) {

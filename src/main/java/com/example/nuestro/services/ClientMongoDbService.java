@@ -1,6 +1,7 @@
 package com.example.nuestro.services;
 import com.example.nuestro.entities.Post;
 import com.example.nuestro.entities.User;
+import com.example.nuestro.services.interfaces.IClientDatabase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -114,6 +115,11 @@ public class ClientMongoDbService implements IClientDatabase
 
     @Override
     public boolean doesTableExist(String tableName) {
+        return false;
+    }
+
+    @Override
+    public boolean doesDatabaseExist(String databaseName) {
         return false;
     }
 
