@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -35,7 +36,7 @@ public class SecurityConfig {
             "/swagger-ui/swagger-initializer.js",
             "swagger-ui/index.html",
             "/v3/api-docs/**",
-            //"/api/v1/files/**"
+            //"/api/v1/posts/**"
     };
 
     @Bean
@@ -47,13 +48,17 @@ public class SecurityConfig {
                 .headers(h->h.disable())
                 .csrf(csrf->csrf.disable())
                 .authorizeHttpRequests(requests->
-                        requests.requestMatchers( AUTH_WHITELIST).permitAll()
-                                .anyRequest().authenticated())
+                        requests.requestMatchers(HttpMethod.GET,"/api/v1/posts").permitAll()
+                                .requestMatchers( AUTH_WHITELIST).permitAll()
+                                 .anyRequest().authenticated()
+
+                )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(AuthenticationProvider)
                 .addFilterBefore(JwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                  ;
         //.httpBasic(Customizer.withDefaults())
+
         return httpSecurity.build();
     }
 }
