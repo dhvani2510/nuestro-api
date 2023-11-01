@@ -14,20 +14,21 @@ public class UserModel {
     public LocalDate birthDate;
     public  String email;
 
-    private String image;
+    private String username;
 
     public Integer age;
     private DatabaseType databaseType;
+    public  UserModel(){}
 
-    public UserModel(String id, String name, String surname, LocalDate birthDay, String email, Integer age, String imageId) {
-        this.id = id;
-        this.firstName= name;
-        this.lastName= surname;
-        this.email=email;
-        this.birthDate = birthDay;
-        this.age = age==null? getAge(birthDay): age;
-        this.image= StringHelper.GetFileUrl(imageId);
-    }
+//    public UserModel(String id, String name, String surname, LocalDate birthDay, String email, Integer age, String imageId) {
+//        this.id = id;
+//        this.firstName= name;
+//        this.lastName= surname;
+//        this.email=email;
+//        this.birthDate = birthDay;
+//        this.age = age==null? getAge(birthDay): age;
+//        this.username= use;
+//    }
     public  UserModel(User user)
     {   this.id = user.getId();
         this.firstName= user.getFirstName();
@@ -35,7 +36,7 @@ public class UserModel {
         this.email=user.getEmail();
         this.birthDate = user.getBirthDate();
         this.age = age==null? getAge(birthDate): age;
-        //this.image= StringHelper.GetFileUrl(user.getImageId());
+        this.username= user.getUsername();
         this.databaseType=user.getDatabaseType();
     }
 
@@ -47,12 +48,12 @@ public class UserModel {
         return age.getYears();
     }
 
-    public String getImage() {
-        return image;
+    public String getUsername() {
+        return username;
     }
 
-    public void setImage(String image) {
-        this.image = image;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public DatabaseType getDatabaseType() {

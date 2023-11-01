@@ -47,6 +47,7 @@ public class SecurityConfig {
         httpSecurity
                 .headers(h->h.disable())
                 .csrf(csrf->csrf.disable())
+                .cors().and()
                 .authorizeHttpRequests(requests->
                         requests.requestMatchers(HttpMethod.GET,"/api/v1/posts").permitAll()
                                 .requestMatchers( AUTH_WHITELIST).permitAll()
