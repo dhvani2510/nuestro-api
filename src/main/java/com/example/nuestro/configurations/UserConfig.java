@@ -69,7 +69,7 @@ public class UserConfig {
         String server ="iverique.com"; //iverique.com
         var database="nuestro";
         String username="root";
-        String password="ThisIsAStrongPassword!";
+        String password="ThisIsAStrongPassword";
         var port="27017";
         return new UpdateDatabaseRequest(server,port,database,username,password, DatabaseType.MONGODB);
     }

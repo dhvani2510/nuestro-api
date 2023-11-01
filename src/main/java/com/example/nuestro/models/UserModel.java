@@ -2,6 +2,7 @@ package com.example.nuestro.models;
 
 import com.example.nuestro.entities.User;
 import com.example.nuestro.entities.datatypes.DatabaseType;
+import com.example.nuestro.models.users.UpdateDatabaseResponse;
 import com.example.nuestro.shared.helpers.StringHelper;
 
 import java.time.LocalDate;
@@ -18,6 +19,8 @@ public class UserModel {
 
     public Integer age;
     private DatabaseType databaseType;
+
+    private UpdateDatabaseResponse database;
     public  UserModel(){}
 
 //    public UserModel(String id, String name, String surname, LocalDate birthDay, String email, Integer age, String imageId) {
@@ -29,8 +32,7 @@ public class UserModel {
 //        this.age = age==null? getAge(birthDay): age;
 //        this.username= use;
 //    }
-    public  UserModel(User user)
-    {   this.id = user.getId();
+    public  UserModel(User user) {   this.id = user.getId();
         this.firstName= user.getFirstName();
         this.lastName= user.getLastName();
         this.email=user.getEmail();
@@ -38,6 +40,14 @@ public class UserModel {
         this.age = age==null? getAge(birthDate): age;
         this.username= user.getUsername();
         this.databaseType=user.getDatabaseType();
+
+        try{
+            this.database= new UpdateDatabaseResponse(user);
+        }
+        catch (Exception e){
+            System.out.println(e.getMessage());
+        };
+
     }
 
     private  Integer getAge(LocalDate birthDay){
@@ -62,5 +72,13 @@ public class UserModel {
 
     public void setDatabaseType(DatabaseType databaseType) {
         this.databaseType = databaseType;
+    }
+
+    public UpdateDatabaseResponse getDatabase() {
+        return database;
+    }
+
+    public void setDatabase(UpdateDatabaseResponse database) {
+        this.database = database;
     }
 }
