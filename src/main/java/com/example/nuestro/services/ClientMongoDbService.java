@@ -47,9 +47,10 @@ public class ClientMongoDbService implements IClientDatabase
 
     public boolean isConnectionValid() {
         try {
-            // Attempt a basic query to check the connection validity
-            User user = getUserById("some_user_id"); // Replace "some_user_id" with a valid user ID
-            return user != null;
+            // Execute a simple MongoDB command to check the connection validity
+            mongoTemplate.executeCommand("{ ping: 1 }");
+            System.out.println("Connection is valid.");
+            return true;
         } catch (Exception e) {
             logger.error("Connection is not valid: " + e.getMessage());
             return false;

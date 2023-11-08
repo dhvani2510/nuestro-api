@@ -96,29 +96,12 @@ public class DatabaseHelper
         return String.format("jdbc:mysql://%s:%d/%s?user=%s&password=%s", server, port, databaseName, username, password);
     }
 
-    public static String GenerateMongoDBURI2(String server, int port, String databaseName, String username, String password) {
-        try {
-            String encodedUsername = URLEncoder.encode(username, StandardCharsets.UTF_8.toString());
-            String encodedPassword = URLEncoder.encode(password, StandardCharsets.UTF_8.toString());
-            var result=String.format("mongodb://%s:%s@%s:%d/%s", encodedUsername, encodedPassword, server, port, databaseName);
-            return result;
-        } catch (UnsupportedEncodingException e) {
-           System.out.println(e.getMessage());
-            return null;
-        }
-    }
-
-    public static String GenerateMongoDBURI3(String server, int port, String databaseName, String username, String password) {
-        String encodedPassword = URLEncoder.encode(password, StandardCharsets.UTF_8);
-        return String.format("mongodb://%s:%s@%s:%d/%s", username, encodedPassword, server, port, databaseName);
-    }
-    public static String GenerateMongoDBURI(String server, int port, String databaseName, String username, String password) {
-        // Check if username and password are null or empty
+    public static String GenerateMongoDBURI(String server, int port, String databaseName, String username, String password) throws UnsupportedEncodingException {
         if (username == null || username.isEmpty() || password == null || password.isEmpty()) {
-            // If either username or password is missing or empty, omit them
             return String.format("mongodb://%s:%d/%s", server, port, databaseName);
         } else {
-            // If both username and password are provided, include them in the URI
+            username = URLEncoder.encode(username, "UTF-8");
+            password = URLEncoder.encode(password, "UTF-8");
             return String.format("mongodb://%s:%s@%s:%d/%s?authSource=admin", username, password, server, port, databaseName);
         }
     }
