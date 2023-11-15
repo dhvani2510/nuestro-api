@@ -4,6 +4,7 @@ import com.example.nuestro.entities.Post;
 import com.example.nuestro.entities.datatypes.DatabaseType;
 import com.example.nuestro.models.post.PostRequest;
 import com.example.nuestro.models.post.PostResponse;
+import com.example.nuestro.models.post.SearchPostRequest;
 import com.example.nuestro.repositories.PostRepository;
 import com.example.nuestro.shared.exceptions.NuestroException;
 import com.example.nuestro.shared.helpers.StringHelper;
@@ -32,6 +33,19 @@ public class PostService
 
     public List<PostResponse> GetPosts(){
         List<Post> posts= postRepository.findAll();
+        List<PostResponse> result = posts.stream()
+                .map(u -> new PostResponse(u))
+                .toList();
+        return result;
+    }
+
+    public List<PostResponse> SearchPosts(SearchPostRequest searchPostRequest){
+      logger.info("Searching posts with {}", searchPostRequest.getKeyword());
+
+        //StringHelper.StringIsNullOrEmpty(searchPostRequest.getUserId() )
+        //NOT working postRepository.findByContentContainingAndUser_Id(searchPostRequest.getKeyword(), searchPostRequest.getUserId());
+        List<Post> posts= postRepository.findByContentContaining(searchPostRequest.getKeyword());
+
         List<PostResponse> result = posts.stream()
                 .map(u -> new PostResponse(u))
                 .toList();
