@@ -1,7 +1,9 @@
 package com.example.nuestro.services;
 
+import com.example.nuestro.entities.Post;
 import com.example.nuestro.entities.User;
 import com.example.nuestro.entities.datatypes.DatabaseType;
+import com.example.nuestro.models.UserModel;
 import com.example.nuestro.services.interfaces.IClientDatabase;
 import com.example.nuestro.shared.exceptions.NuestroException;
 import com.example.nuestro.shared.helpers.DatabaseHelper;
@@ -12,6 +14,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.sql.DataSource;
+import java.util.List;
 
 @Service
 public class ClientDatabaseService

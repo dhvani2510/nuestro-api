@@ -25,16 +25,20 @@ public class ClientMongoDbService implements IClientDatabase
         this.mongoTemplate= mongoTemplate;
     }
 
+
     public void AddToClientDatabase(User user, List<Post> posts) throws Exception {
         logger.info("Connecting to client database, creating user and posts");
 
+        Query query = new Query(Criteria.where("id").is(user.getId()));
+        var userInTheDb= mongoTemplate.findOne(query, User.class);
         // Create a user in MongoDB
+        if(userInTheDb !=null)
         mongoTemplate.save(user);
 
         // Create posts for the user in MongoDB
         if(posts!=null)
         for (Post post : posts) {
-            post.setUser(user);
+            //post.setUser(user);
             mongoTemplate.save(post);
         }
     }
@@ -49,7 +53,8 @@ public class ClientMongoDbService implements IClientDatabase
         try {
             // Execute a simple MongoDB command to check the connection validity
             mongoTemplate.executeCommand("{ ping: 1 }");
-            System.out.println("Connection is valid.");
+            logger.info("Connection is valid");
+            //System.out.println("Connection is valid.");
             return true;
         } catch (Exception e) {
             logger.error("Connection is not valid: " + e.getMessage());

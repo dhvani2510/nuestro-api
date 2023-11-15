@@ -110,13 +110,7 @@ public class PostService
 //        jdbcTemplate.update(sql, user.getId(), user.getCreatedAt(), user.getCreatorId(), user.getContent(), post.getUser().id);
 //    }
     //Add the number of reads over time? Big Long,
-    public void synchronizeData() throws Exception { // Get users, for each, get data verify and
 
-//        var users= userService.GetUsers();
-//
-//        for (var user : users) {
-//            var posts= postRepository.findByUserId(user.id);
-//            clientService.AddToClientDatabase(user, posts);
-//        }
-    }
+
+
 }

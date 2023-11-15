@@ -12,7 +12,6 @@ public class ProfileResponse
     private  String lastName;
     private String image;
     private LocalDate birthDate;
-    private DatabaseType databaseType;
 
     public String getFirstName() {
         return firstName;
@@ -53,13 +52,5 @@ public class ProfileResponse
         //this.image = StringHelper.GetFileUrl(user.getImageId());
         this.birthDate = user.getBirthDate();
         //this.getDatabaseType=user.getDatabaseType();
-    }
-
-    public DatabaseType getDatabaseType() {
-        return databaseType;
-    }
-
-    public void setDatabaseType(DatabaseType databaseType) {
-        this.databaseType = databaseType;
     }
 }

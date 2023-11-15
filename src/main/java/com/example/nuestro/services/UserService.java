@@ -32,6 +32,7 @@ import java.util.regex.Pattern;
 @Service
 public class UserService {
     private  final UserRepository userRepository;
+    private  final SynchronizeService synchronizeService;
     private  final JwtService jwtService;
     private  final AuthenticationManager authenticationManager;
     private  final PasswordEncoder passwordEncoder;
@@ -41,8 +42,9 @@ public class UserService {
     private static final Logger logger= LoggerFactory.getLogger(UserService.class);
 
     @Autowired
-    public  UserService(UserRepository userRepository, JwtService jwtService, AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, ClientDatabaseService clientService){
+    public  UserService(UserRepository userRepository, SynchronizeService synchronizeService, JwtService jwtService, AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, ClientDatabaseService clientService){
         this.userRepository=userRepository;
+        this.synchronizeService = synchronizeService;
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
         this.passwordEncoder = passwordEncoder;
@@ -129,7 +131,7 @@ public class UserService {
 
         user.Update(updateDatabaseRequest);
         var clientDatabase= clientService.getDatabase(user);
-        //clientDatabase.doesDatabaseExist(user.getDbDatabase());
+        var exists=clientDatabase.doesDatabaseExist(user.getDbDatabase());
         if(!clientDatabase.isConnectionValid()){
             throw  new NuestroException("Failed to connect to database. Check if database is created");
         }
@@ -139,7 +141,8 @@ public class UserService {
 
         clientDatabase.updateUser(user);
 
-        userRepository.save(user); //synchornize
+        userRepository.save(user);
+        synchronizeService.synchronizeData(user.getId()); //synchornize
 
         logger.info("Database updated");
         return new ProfileResponse(user);
