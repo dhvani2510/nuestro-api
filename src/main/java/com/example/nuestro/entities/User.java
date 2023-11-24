@@ -174,17 +174,6 @@ public class User extends  BaseEntity implements UserDetails, IUser
         this.password = password; // encrypt
     }
 
-//    public String getImageId() {
-//        return image==null? null: image.getId();
-//    }
-//    public File getImage() {
-//        return image;
-//    }
-//
-//    public void setImage(File image) {
-//        this.image = image;
-//    }
-
     public DatabaseType getDatabaseType() {
         return databaseType;
     }
@@ -193,8 +182,8 @@ public class User extends  BaseEntity implements UserDetails, IUser
         this.databaseType = databaseType;
     }
 
-    public String getDbServer() throws Exception {
-        return EncryptionHelper.decrypt(dbServer);
+    public String getDbServer()  {
+        return dbServer;
     }
 
     public void setDbServer(String db_server) {
@@ -202,7 +191,7 @@ public class User extends  BaseEntity implements UserDetails, IUser
     }
 
     public String getDbPort() throws Exception {
-        return EncryptionHelper.decrypt(dbPort);
+        return dbPort;
     }
 
     public void setDbPort(String db_port) {
@@ -210,7 +199,7 @@ public class User extends  BaseEntity implements UserDetails, IUser
     }
 
     public String getDbDatabase() throws Exception {
-        return EncryptionHelper.decrypt(dbDatabase);
+        return dbDatabase;
     }
 
     public void setDbDatabase(String db_database) {
@@ -218,7 +207,7 @@ public class User extends  BaseEntity implements UserDetails, IUser
     }
 
     public String getDbUsername() throws Exception {
-        return EncryptionHelper.decrypt(dbUsername);
+        return dbUsername;
     }
 
     public void setDbUsername(String db_username) {
@@ -226,7 +215,7 @@ public class User extends  BaseEntity implements UserDetails, IUser
     }
 
     public String getDbPassword() throws Exception {
-        return EncryptionHelper.decrypt(dbPassword);
+        return dbPassword;
     }
 
     public void setDbPassword(String db_password) {
@@ -238,11 +227,11 @@ public class User extends  BaseEntity implements UserDetails, IUser
     }
 
     private String GenerateConnectionString(DatabaseType databaseType) throws Exception {
-        var server = getDbServer();
-        var port = Integer.parseInt(getDbPort());
-        var database = getDbDatabase();
-        var username = getDbUsername();
-        var password = getDbPassword();
+        var server = EncryptionHelper.decrypt(getDbServer());
+        var port = Integer.parseInt(EncryptionHelper.decrypt(getDbPort()));
+        var database = EncryptionHelper.decrypt(getDbDatabase());
+        var username = EncryptionHelper.decrypt(getDbUsername());
+        var password = EncryptionHelper.decrypt(getDbPassword());
 
         return switch (databaseType) {
             case MYSQL -> DatabaseHelper.GenerateMySQLConnectionString(server, port, database, username, password);

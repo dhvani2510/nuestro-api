@@ -78,8 +78,6 @@ public class UserService {
            throw new NuestroException("First name is empty");
        if(StringIsNullOrEmpty(profileRequest.getFirstName()))
            throw new NuestroException("Last name is empty");
-       if(profileRequest.getBirthDate()==null)
-           throw new NuestroException("Birthday is null");
 
        logger.info("Getting user profile from context");
        var auth= SecurityContextHolder.getContext().getAuthentication();
@@ -94,14 +92,7 @@ public class UserService {
 
        user.setFirstName(profileRequest.getFirstName());
        user.setLastName( profileRequest.getLastName());
-//       if(profileRequest.getDatabaseType()== DatabaseType.)
-//           throw new NuestroException("Secondary language cannot be set to english");
-
-       user.setDatabaseType(profileRequest.getDatabaseType());
-       //if(profileRequest.getImage()!=null){
-           //var image= fileService.Upload(profileRequest.getImage());
-           //user.setImage(image);
-      // }
+       
        userRepository.save(user);
 
        logger.info("User profile updated");
@@ -143,9 +134,9 @@ public class UserService {
 
         clientDatabase.updateUser(user);
 
-        userRepository.save(user);
         synchronizeService.synchronizeData(user.getId()); //synchornize
 
+        userRepository.save(user);
         logger.info("Database updated");
         return new ProfileResponse(user);
     }
