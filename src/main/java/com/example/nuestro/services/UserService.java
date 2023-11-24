@@ -22,6 +22,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.security.MessageDigest;
@@ -70,6 +71,7 @@ public class UserService {
         return new UserModel(user);
     }
 
+    @Transactional(rollbackFor = Exception.class)
    public ProfileResponse UpdateProfile(ProfileRequest profileRequest) throws NuestroException, IOException {
        if(StringIsNullOrEmpty(profileRequest.getFirstName()))
            throw new NuestroException("First name is empty");
@@ -107,6 +109,7 @@ public class UserService {
        return new ProfileResponse(user);
      }
 
+    @Transactional(rollbackFor = Exception.class)
     public ProfileResponse UpdateDatabase(UpdateDatabaseRequest updateDatabaseRequest) throws Exception {
 
         logger.info("User is updating database connection");
@@ -194,6 +197,7 @@ public class UserService {
                 .orElseThrow(()-> new NuestroException("User not found"));
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public RegisterResponse register(RegisterRequest registerRequest) throws NuestroException {
 
         logger.info("User is registering with email {} and name {}", registerRequest.getEmail(), registerRequest.getFirstName());
@@ -232,6 +236,7 @@ public class UserService {
         return  response;
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public AuthenticationResponse authenticate(AuthenticationRequest authenticationRequest) throws NuestroException {
 
         var auth= SecurityContextHolder.getContext().getAuthentication();

@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.xml.crypto.Data;
 import java.util.List;
@@ -59,6 +60,7 @@ public class PostService
         return  new PostResponse(post);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public  PostResponse CreatePost(PostRequest postRequest) throws Exception {
         logger.info("User adding post with content {}",postRequest.getContent());
 
@@ -82,6 +84,7 @@ public class PostService
         return  new PostResponse(post);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public  PostResponse UpdatePost(String id, PostRequest postRequest) throws Exception {
         logger.info("User updating post {} with content {}" ,id, postRequest.getContent());
 
@@ -99,7 +102,7 @@ public class PostService
         postRepository.save(post);//synchonize
         return new PostResponse(post);
     }
-
+    @Transactional(rollbackFor = Exception.class)
     public  void Delete(String id) throws Exception {
         logger.info("User deleting post {}",id);
         var post= postRepository.findById(id)
