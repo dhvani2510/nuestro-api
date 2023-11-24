@@ -96,4 +96,19 @@ public class UserController {
             return ResponseModel.Fail("Error occured", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @DeleteMapping
+    public ResponseEntity<ResponseModel> Delete()
+    {
+        try{
+            userService.Delete();
+            return ResponseModel.Ok("User deleted successfully");
+        }
+        catch (NuestroException e){
+            return  ResponseModel.Fail(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+        catch (Exception e){
+            return  ResponseModel.Fail("Error occured", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.security.MessageDigest;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 @Service
@@ -230,7 +231,7 @@ public class UserService {
         user.setDatabaseType(DatabaseType.None);
         userRepository.save(user);
 
-        var response= new RegisterResponse(user.getId(),user.getEmail(),user.getFirstName(), user.getLastName());
+        var response= new RegisterResponse(user.getId(),user.getFirstName(), user.getLastName(),user.getEmail());
         return  response;
     }
 
@@ -257,6 +258,26 @@ public class UserService {
                 //.builder()
                 .setToken(jwtToken)
                 .build();
+    }
+
+
+    @Transactional(rollbackFor = Exception.class)
+    public  void Delete() throws Exception {
+        logger.info("Deleting user");
+
+        var userContext= GetUserContext();
+        var user= GetUser(userContext.getId());
+        if(!Objects.equals(userContext.getId(), user.getId()))
+            throw  new NuestroException("Not authorized to delete another user");
+
+        //Synchonize?
+//        if(user.getDatabaseType()!=DatabaseType.None){
+//            var clientDatabase= clientService.getDatabase(user);
+//            clientDatabase.deleteUser(user.getId());
+//        }
+
+        userRepository.delete(user);
+        logger.info("User deleted successfully");
     }
 
     private  void authenticate(String email, String password) throws NuestroException {
