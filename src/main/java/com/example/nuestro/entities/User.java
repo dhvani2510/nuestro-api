@@ -168,6 +168,7 @@ public class User extends  BaseEntity implements UserDetails, IUser
         this.password = builder.password;
         this.role =builder.role;
         this.setCreatedAt(LocalDateTime.now());
+        this.setCreatorId(this.id);
     }
 
     public void setPassword(String password) {

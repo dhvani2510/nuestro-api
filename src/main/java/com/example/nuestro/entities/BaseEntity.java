@@ -1,6 +1,5 @@
 package com.example.nuestro.entities;
 
-import com.example.nuestro.entities.interfaces.IUser;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
@@ -8,7 +7,6 @@ import jakarta.persistence.MappedSuperclass;
 import java.time.LocalDateTime;
 
 @MappedSuperclass
-
 public abstract class BaseEntity{
 
      //public UUID Id;
@@ -20,8 +18,21 @@ public abstract class BaseEntity{
      @Column(name = "creator_id")
      protected String creatorId;
 
+     @Column(name="updated_at")
+     protected LocalDateTime updatedAt;
+
+     @Column(name = "updater_id")
+     protected String updaterId;
+
+     public LocalDateTime getUpdatedAt() {
+          return updatedAt;
+     }
+
      public LocalDateTime getCreatedAt() {
           return createdAt;
+     }
+     public void setUpdatedAt(LocalDateTime updatedAt) {
+          this.updatedAt = updatedAt;
      }
 
      public void setCreatedAt(LocalDateTime createdAt) {
@@ -40,18 +51,14 @@ public abstract class BaseEntity{
      public String getCreatorId() {
           return creatorId;
      }
+     public String getUpdaterId() {
+          return updaterId;
+     }
 
      public void setCreatorId(String creatorId) {
           this.creatorId = creatorId;
      }
-
-//     @SequenceGenerator(
-//             name = "language_sequence",
-//             sequenceName = "language_sequence",
-//             allocationSize = 1
-//     )
-//     @GeneratedValue(
-//             strategy = GenerationType.SEQUENCE,
-//             generator = "language_sequence"
-//     )
+     public void setUpdaterId(String creatorId) {
+          this.updaterId = creatorId;
+     }
 }

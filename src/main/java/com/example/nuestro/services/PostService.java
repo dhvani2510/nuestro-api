@@ -94,6 +94,7 @@ public class PostService
                 .orElseThrow(()-> new NuestroException("Post not find"));
 
         post.Set(postRequest);
+        post.setUpdaterId(post.getUser().getId());
         if(post.getUser().getDatabaseType()!= DatabaseType.None){
             var user= userService.GetUser(post.getUser().getId());
             var clientDatabase= clientService.getDatabase(user);
@@ -120,14 +121,4 @@ public class PostService
         if(StringHelper.StringIsNullOrEmpty(postRequest.getContent()))
             throw  new NuestroException("Content is empty");
     }
-
-
-//    private void addUser(User user, JdbcTemplate jdbcTemplate) {
-//        String sql = "INSERT INTO users (id,created_at, creator_id, content, user_id) VALUES (?, ?, ?, ?, ?)";
-//        jdbcTemplate.update(sql, user.getId(), user.getCreatedAt(), user.getCreatorId(), user.getContent(), post.getUser().id);
-//    }
-    //Add the number of reads over time? Big Long,
-
-
-
 }

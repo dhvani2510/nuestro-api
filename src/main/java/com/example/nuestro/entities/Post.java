@@ -3,9 +3,6 @@ package com.example.nuestro.entities;
 import com.example.nuestro.entities.interfaces.IPost;
 import com.example.nuestro.models.post.PostRequest;
 import jakarta.persistence.*;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
-
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -30,10 +27,11 @@ public class Post extends  BaseEntity  implements IPost
         this.content = content;
         this.user= user;
         this.setCreatedAt(LocalDateTime.now());
+        this.creatorId=this.user.getId();
     }
     public void Set(PostRequest translationRequest) {
       this.content=translationRequest.getContent();
-      this.setCreatedAt(LocalDateTime.now());
+      this.setUpdatedAt(LocalDateTime.now());
     }
 
     public String getContent() {

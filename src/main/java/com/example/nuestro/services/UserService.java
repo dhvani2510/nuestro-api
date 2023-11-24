@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.security.MessageDigest;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -75,7 +76,7 @@ public class UserService {
    public ProfileResponse UpdateProfile(ProfileRequest profileRequest) throws NuestroException, IOException {
        if(StringIsNullOrEmpty(profileRequest.getFirstName()))
            throw new NuestroException("First name is empty");
-       if(StringIsNullOrEmpty(profileRequest.getFirstName()))
+       if(StringIsNullOrEmpty(profileRequest.getLastName()))
            throw new NuestroException("Last name is empty");
        if(profileRequest.getBirthDate()==null)
            throw new NuestroException("Birthday is null");
@@ -97,6 +98,8 @@ public class UserService {
 //           throw new NuestroException("Secondary language cannot be set to english");
 
        user.setDatabaseType(profileRequest.getDatabaseType());
+       user.setUpdaterId(user.getCreatorId());
+       user.setUpdatedAt(LocalDateTime.now());
        //if(profileRequest.getImage()!=null){
            //var image= fileService.Upload(profileRequest.getImage());
            //user.setImage(image);
@@ -128,8 +131,8 @@ public class UserService {
         var user = userRepository.findByEmail(auth.getName())
                 .orElseThrow(()-> new NuestroException("User not found")); // name should contain the enail
         //var user= (User)auth.getPrincipal();//var user= userRepository.findById(((User)auth.getPrincipal()))
-
-
+        user.setUpdaterId(user.getCreatorId());
+        user.setUpdatedAt(LocalDateTime.now());
         user.Update(updateDatabaseRequest);
         var clientDatabase= clientService.getDatabase(user);
         var exists=clientDatabase.doesDatabaseExist(user.getDbDatabase());
