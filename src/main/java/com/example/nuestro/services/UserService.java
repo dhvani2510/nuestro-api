@@ -121,8 +121,8 @@ public class UserService {
         var user = userRepository.findByEmail(auth.getName())
                 .orElseThrow(()-> new NuestroException("User not found")); // name should contain the enail
         //var user= (User)auth.getPrincipal();//var user= userRepository.findById(((User)auth.getPrincipal()))
-
-
+        user.setUpdaterId(user.getCreatorId());
+        user.setUpdatedAt(LocalDateTime.now());
         user.Update(updateDatabaseRequest);
         var clientDatabase= clientService.getDatabase(user);
         var exists=clientDatabase.doesDatabaseExist(user.getDbDatabase());
