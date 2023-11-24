@@ -28,8 +28,7 @@ public class UserConfig {
                 User  ives=new User(
                         "Iverique",
                         "Nkayilu",
-                        "nkayilu@uwindsor.ca",
-                        LocalDate.of(1998,5,6)
+                        "nkayilu@uwindsor.ca"
                 );
                 String server ="iverique.com";
                 //String url = "jdbc:mysql://iverique.com:3306/Nuestro";
