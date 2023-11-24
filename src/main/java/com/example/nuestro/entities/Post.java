@@ -2,19 +2,16 @@ package com.example.nuestro.entities;
 
 import com.example.nuestro.entities.interfaces.IPost;
 import com.example.nuestro.models.post.PostRequest;
+import com.example.nuestro.services.AuditListener;
 import jakarta.persistence.*;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
-
+import org.hibernate.envers.Audited;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "posts"
-        ,indexes = @Index(name = "content_index",columnList = "content")
-)
+@Table(name = "posts")
+@Audited
+@EntityListeners(AuditListener.class)
 //@Document(collection = "posts")
 public class Post extends  BaseEntity  implements IPost
 {
@@ -22,11 +19,9 @@ public class Post extends  BaseEntity  implements IPost
     //@Indexed(unique=true)
     @GeneratedValue(strategy= GenerationType.UUID)
     private String id;
-
     private  String content;
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(unique = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
     public Post() {}
@@ -36,10 +31,11 @@ public class Post extends  BaseEntity  implements IPost
         this.content = content;
         this.user= user;
         this.setCreatedAt(LocalDateTime.now());
+        this.creatorId=this.user.getId();
     }
     public void Set(PostRequest translationRequest) {
       this.content=translationRequest.getContent();
-      this.setCreatedAt(LocalDateTime.now());
+      this.setUpdatedAt(LocalDateTime.now());
     }
 
     public String getContent() {

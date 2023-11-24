@@ -4,6 +4,7 @@ import com.example.nuestro.entities.datatypes.DatabaseType;
 import com.example.nuestro.entities.datatypes.Role;
 import com.example.nuestro.entities.interfaces.IUser;
 import com.example.nuestro.models.users.UpdateDatabaseRequest;
+import com.example.nuestro.services.AuditListener;
 import com.example.nuestro.shared.helpers.DatabaseHelper;
 import com.example.nuestro.shared.helpers.EncryptionHelper;
 import jakarta.persistence.*;
@@ -11,14 +12,15 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.Period;
 import java.util.Collection;
 import java.util.List;
+import org.hibernate.envers.Audited;
 
 @Entity
 @Table(name = "users")
+@Audited
+@EntityListeners(AuditListener.class)
 public class User extends  BaseEntity implements UserDetails, IUser
 {
     @Id
