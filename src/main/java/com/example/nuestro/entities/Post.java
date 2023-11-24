@@ -10,7 +10,9 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "posts")
+@Table(name = "posts"
+        ,indexes = @Index(name = "content_index",columnList = "content")
+)
 //@Document(collection = "posts")
 public class Post extends  BaseEntity  implements IPost
 {
@@ -18,6 +20,7 @@ public class Post extends  BaseEntity  implements IPost
     //@Indexed(unique=true)
     @GeneratedValue(strategy= GenerationType.UUID)
     private String id;
+
     private  String content;
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(unique = false)

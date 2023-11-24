@@ -53,9 +53,15 @@ public class PostService
     public List<PostResponse> SearchPosts(SearchPostRequest searchPostRequest){
       logger.info("Searching posts with {}", searchPostRequest.getKeyword());
 
+        long startTime = System.currentTimeMillis();
         //StringHelper.StringIsNullOrEmpty(searchPostRequest.getUserId() )
         //NOT working postRepository.findByContentContainingAndUser_Id(searchPostRequest.getKeyword(), searchPostRequest.getUserId());
         List<Post> posts= postRepository.findByContentContaining(searchPostRequest.getKeyword());
+
+        long endTime = System.currentTimeMillis();
+        long executionTime = endTime - startTime;
+
+        logger.info("SearchPosts method execution time: {} milliseconds", executionTime);
 
         List<PostResponse> result = posts.stream()
                 .map(u -> new PostResponse(u))
