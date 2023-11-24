@@ -110,6 +110,7 @@ public class PostService
                 .orElseThrow(()-> new NuestroException("Post not find"));
 
         post.Set(postRequest);
+        post.setUpdaterId(post.getUser().getId());
         if(post.getUser().getDatabaseType()!= DatabaseType.None){
             var user= userService.GetUser(post.getUser().getId());
             var clientDatabase= clientService.getDatabase(user);
