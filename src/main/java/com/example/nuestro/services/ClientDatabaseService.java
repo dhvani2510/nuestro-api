@@ -7,6 +7,7 @@ import com.example.nuestro.models.UserModel;
 import com.example.nuestro.services.interfaces.IClientDatabase;
 import com.example.nuestro.shared.exceptions.NuestroException;
 import com.example.nuestro.shared.helpers.DatabaseHelper;
+import com.example.nuestro.shared.helpers.EncryptionHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -41,7 +42,7 @@ public class ClientDatabaseService
             var mongoClient =DatabaseHelper
                     //.createMongoClient(user);
             .createMongoClient(user.getConnectionString());
-            var mongoTemplate= new MongoTemplate(mongoClient, user.getDbDatabase());
+            var mongoTemplate= new MongoTemplate(mongoClient, EncryptionHelper.decrypt(user.getDbDatabase()));
             return new ClientMongoDbService(mongoTemplate);
         }
         else  if(user.getDatabaseType()==DatabaseType.MSSQL){

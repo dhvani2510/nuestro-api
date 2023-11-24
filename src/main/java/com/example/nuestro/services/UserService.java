@@ -142,9 +142,9 @@ public class UserService {
 
         clientDatabase.updateUser(user);
 
-        userRepository.save(user);
         synchronizeService.synchronizeData(user.getId()); //synchornize
 
+        userRepository.save(user);
         logger.info("Database updated");
         return new ProfileResponse(user);
     }
