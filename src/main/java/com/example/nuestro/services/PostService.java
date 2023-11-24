@@ -33,7 +33,17 @@ public class PostService
     }
 
     public List<PostResponse> GetPosts(){
+        logger.info("Getting posts");
         List<Post> posts= postRepository.findAll();
+        List<PostResponse> result = posts.stream()
+                .map(u -> new PostResponse(u))
+                .toList();
+        return result;
+    }
+
+    public List<PostResponse> GetPosts(String userId){
+        logger.info("Getting user {} posts", userId);
+        List<Post> posts= postRepository.findByUserId(userId);
         List<PostResponse> result = posts.stream()
                 .map(u -> new PostResponse(u))
                 .toList();

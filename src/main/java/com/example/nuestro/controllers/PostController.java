@@ -26,6 +26,13 @@ public class PostController {
         return ResponseModel.Ok("Posts fetched", posts);
     }
 
+    @GetMapping("users/{userId}")
+    public ResponseEntity<ResponseModel> GetPosts(@PathVariable String userId)
+    {
+        var posts=  postService.GetPosts(userId);
+        return ResponseModel.Ok("User posts fetched", posts);
+    }
+
     @GetMapping("{id}")
     public ResponseEntity<ResponseModel> GetPost(@PathVariable String id)
     {
