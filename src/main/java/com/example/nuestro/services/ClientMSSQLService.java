@@ -119,17 +119,16 @@ public class ClientMSSQLService implements IClientDatabase
     }
     public void addUser(User user) throws Exception {
         String sql = "INSERT INTO users " +
-                "(id, created_at, creator_id, deleted_at, birth_date, database_type, " +
+                "(id, created_at, creator_id, deleted_at, database_type, " +
                 "db_database, db_password, db_port, db_server, db_username, email, first_name, last_name, " +
                 "password) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         jdbcTemplate.update(sql,
                 user.getId(),
                 user.getCreatedAt(),
                 user.getCreatorId(),
                 user.getDeletedAt(),
-                user.getBirthDate(),
                 user.getDatabaseType().toString(),
                 user.getDbDatabase(),
                 user.getDbPassword(),
@@ -145,13 +144,12 @@ public class ClientMSSQLService implements IClientDatabase
 
     public void updateUser(User user) throws Exception {
         String sql = "UPDATE users " +
-                "SET birth_date = ?, database_type = ?, " +
+                "SET database_type = ?, " +
                 "db_database = ?, db_password = ?, db_port = ?, db_server = ?, db_username = ?, " +
                 "email = ?, first_name = ?, last_name = ?, password = ? " +
                 "WHERE id = ?";
 
         jdbcTemplate.update(sql,
-                user.getBirthDate().toString(),
                 user.getDatabaseType().toString(),
                 user.getDbDatabase(),
                 user.getDbPassword(),

@@ -8,10 +8,10 @@ import java.time.LocalDate;
 
 public class ProfileResponse
 {
+    private  String id;
     private  String firstName;
     private  String lastName;
-    private String image;
-    private LocalDate birthDate;
+    private String email;
 
     public String getFirstName() {
         return firstName;
@@ -29,28 +29,27 @@ public class ProfileResponse
         this.lastName = lastName;
     }
 
-    public String getImage() {
-        return image;
+    public String getId() {
+        return id;
     }
 
-    public void setImage(String image) {
-        this.image = image;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public LocalDate getBirthDate() {
-        return birthDate;
+    public String getEmail() {
+        return email;
     }
 
-    public void setBirthDate(LocalDate birthDate) {
-        this.birthDate = birthDate;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public ProfileResponse(User user)
     {
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
-        //this.image = StringHelper.GetFileUrl(user.getImageId());
-        this.birthDate = user.getBirthDate();
-        //this.getDatabaseType=user.getDatabaseType();
+        this.id = user.getId();
+        this.email=user.getEmail();
     }
 }

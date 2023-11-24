@@ -17,8 +17,6 @@ public interface IUser extends UserDetails {
 
     String getLastName();
 
-    LocalDate getBirthDate();
-
     String getEmail();
 
     String getPassword();
@@ -36,8 +34,6 @@ public interface IUser extends UserDetails {
     String getDbPassword() throws Exception;
 
     DatabaseType getDatabaseType();
-
-    Integer getAge();
 
     Role getRole();
 

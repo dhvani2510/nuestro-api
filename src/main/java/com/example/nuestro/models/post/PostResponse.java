@@ -1,21 +1,22 @@
 package com.example.nuestro.models.post;
 
 import com.example.nuestro.entities.Post;
+import com.example.nuestro.models.users.ProfileResponse;
 
 public class PostResponse
 {
     private String Id;
     private  String Content;
-    private  String User;
+    private ProfileResponse User;
 
     public PostResponse(String id, String content) {
         Id = id;
         Content = content;
     }
-    public PostResponse(Post translation){
-        Id= translation.getId();
-        Content=translation.getContent();
-        User= translation.getUser().getUsername();
+    public PostResponse(Post post){
+        Id= post.getId();
+        Content=post.getContent();
+        User= new ProfileResponse(post.getUser());
     }
 
     public String getId() {
@@ -34,11 +35,11 @@ public class PostResponse
         Content = content;
     }
 
-    public String getUser() {
+    public ProfileResponse getUser() {
         return User;
     }
 
-    public void setUser(String user) {
+    public void setUser(ProfileResponse user) {
         User = user;
     }
 }

@@ -91,8 +91,6 @@ public class UserService {
                .orElseThrow(()-> new NuestroException("User not found")); // name should contain the enail
        //var user= (User)auth.getPrincipal();//var user= userRepository.findById(((User)auth.getPrincipal()))
 
-       if(profileRequest.getBirthDate()!=null)
-           user.setBirthDate( profileRequest.getBirthDate());
        user.setFirstName(profileRequest.getFirstName());
        user.setLastName( profileRequest.getLastName());
 //       if(profileRequest.getDatabaseType()== DatabaseType.)

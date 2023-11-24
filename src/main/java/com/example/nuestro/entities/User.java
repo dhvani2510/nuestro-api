@@ -29,8 +29,6 @@ public class User extends  BaseEntity implements UserDetails, IUser
     private  String firstName;
     @Column(name = "last_name")
     private   String lastName;
-    @Column(name = "birth_date")
-    private LocalDate birthDate;
     @Column(unique = true)
     private   String email;
 
@@ -53,19 +51,15 @@ public class User extends  BaseEntity implements UserDetails, IUser
     @Column(name = "database_type")
     @Enumerated(EnumType.STRING)
     private DatabaseType databaseType;
-    @Transient
-    private Integer age;
 
     @Enumerated(EnumType.STRING)
      private  Role role;
 
-    public  User(String name, String surname, String email, LocalDate birthDate){
+    public  User(String name, String surname, String email){
 
         this.firstName= name;
         this.lastName= surname;
         this.email=email;
-        this.birthDate = birthDate;
-        this.age =getAge();
         this.createdAt = LocalDateTime.now();
         this.role = com.example.nuestro.entities.datatypes.Role.User;
         this.setCreatedAt(LocalDateTime.now());
@@ -83,9 +77,6 @@ public class User extends  BaseEntity implements UserDetails, IUser
         this.databaseType=(databaseRequest.getType());
     }
 
-    public Integer getAge(){
-        return Period.between(this.birthDate,LocalDate.now()).getYears();
-    }
     public void setRole(Role role) {
         this.role =role;
     }
@@ -119,16 +110,6 @@ public class User extends  BaseEntity implements UserDetails, IUser
         this.lastName = lastName;
     }
 
-    @Override
-    public LocalDate getBirthDate() {
-        if(birthDate==null)
-            return  LocalDate.now();
-        return birthDate;
-    }
-
-    public void setBirthDate(LocalDate birthDate) {
-        this.birthDate = birthDate;
-    }
 
     public void setEmail(String email) {
         this.email = email;
@@ -136,10 +117,6 @@ public class User extends  BaseEntity implements UserDetails, IUser
 
     public void setConnectionString(String connectionString) {
         this.connectionString = connectionString;
-    }
-
-    public void setAge(Integer age) {
-        this.age = age;
     }
 
     @Override
