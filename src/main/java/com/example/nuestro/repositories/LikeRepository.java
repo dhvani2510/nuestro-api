@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 @Repository
 public interface LikeRepository extends JpaRepository<Like,String> {
-
-
+    Like findByPost_IdAndUser_Id(String postId, String  userId);
 }
 

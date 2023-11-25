@@ -3,6 +3,7 @@ package com.example.nuestro.services;
 import com.example.nuestro.entities.Post;
 import com.example.nuestro.entities.Like;
 import com.example.nuestro.entities.datatypes.DatabaseType;
+import com.example.nuestro.models.like.LikeResponse;
 import com.example.nuestro.models.post.PostRequest;
 import com.example.nuestro.models.post.PostResponse;
 import com.example.nuestro.models.post.SearchPostRequest;
@@ -111,7 +112,7 @@ public class PostService
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public  PostResponse UpdatePost(String id, PostRequest postRequest) throws Exception {
+    public PostResponse UpdatePost(String id, PostRequest postRequest) throws Exception {
         logger.info("User updating post {} with content {}" ,id, postRequest.getContent());
 
         ValidatePostRequest(postRequest);
@@ -147,21 +148,31 @@ public class PostService
             throw  new NuestroException("Content is empty");
     }
 
-    public Post updateLike(String id) throws NuestroException {
+    @Transactional(rollbackFor = Exception.class)
+    public LikeResponse LikePost(String id) throws Exception {
+
+        logger.info("User likes post {}", id);
+
         Post post = postRepository.findById(id)
                 .orElseThrow(()-> new NuestroException("Post not find"));
-        if (post != null) {
-            // Add a like to the post
-            var user= userService.GetUserContextInstance();
-            Like like = new Like(user);
+        // Add a like to the post
+        var user= userService.GetUserContextInstance();
 
-            like = likeRepository.save(like);
-            var post_new = postRepository.save(post);
+        //check if the post was already liked
+        var liked= likeRepository.findByPost_IdAndUser_Id(post.getId(),user.getId());
+        if(liked!= null)
+            throw new NuestroException("User already liked post");
 
+        var like = new Like(user, post);
+        likeRepository.save(like);
+        if(post.getUser().getDatabaseType()!= DatabaseType.None){
+            var clientDatabase= clientService.getDatabase(user);
+            //TODO
+            //clientDatabase.likePost(like);
         }
-        return post;
-    }
 
+        return new LikeResponse(like.getId(), post.getId(), user.getId());
+    }
 
 
 //    private void addUser(User user, JdbcTemplate jdbcTemplate) {
@@ -169,7 +180,4 @@ public class PostService
 //        jdbcTemplate.update(sql, user.getId(), user.getCreatedAt(), user.getCreatorId(), user.getContent(), post.getUser().id);
 //    }
     //Add the number of reads over time? Big Long,
-
-
-
 }
