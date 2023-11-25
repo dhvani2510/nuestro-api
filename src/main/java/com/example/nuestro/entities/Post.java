@@ -11,7 +11,9 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "posts")
+@Table(name = "posts"
+        ,indexes = @Index(name = "content_index",columnList = "content")
+)
 @EntityListeners(AuditListener.class)
 //@Document(collection = "posts")
 public class Post extends  BaseEntity  implements IPost
@@ -23,6 +25,7 @@ public class Post extends  BaseEntity  implements IPost
     private  String content;
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(unique = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
     @OneToMany(cascade = CascadeType.PERSIST)
