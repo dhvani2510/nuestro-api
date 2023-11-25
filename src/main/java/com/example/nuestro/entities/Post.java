@@ -4,12 +4,17 @@ import com.example.nuestro.entities.interfaces.IPost;
 import com.example.nuestro.models.post.PostRequest;
 import com.example.nuestro.services.AuditListener;
 import jakarta.persistence.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.envers.Audited;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "posts")
+@Table(name = "posts"
+        ,indexes = @Index(name = "content_index",columnList = "content")
+)
 @Audited
 @EntityListeners(AuditListener.class)
 //@Document(collection = "posts")
@@ -19,9 +24,11 @@ public class Post extends  BaseEntity  implements IPost
     //@Indexed(unique=true)
     @GeneratedValue(strategy= GenerationType.UUID)
     private String id;
+
     private  String content;
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(unique = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
     public Post() {}
