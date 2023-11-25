@@ -3,6 +3,7 @@ import com.example.nuestro.entities.Post;
 import com.example.nuestro.models.ResponseModel;
 import com.example.nuestro.models.like.LikeRequest;
 import com.example.nuestro.models.post.PostRequest;
+import com.example.nuestro.models.post.SearchPostRequest;
 import com.example.nuestro.services.PostService;
 import com.example.nuestro.shared.exceptions.NuestroException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,13 @@ public class PostController {
     {
         var posts=  postService.GetPosts();
         return ResponseModel.Ok("Posts fetched", posts);
+    }
+
+    @GetMapping("users/{userId}")
+    public ResponseEntity<ResponseModel> GetPosts(@PathVariable String userId)
+    {
+        var posts=  postService.GetPosts(userId);
+        return ResponseModel.Ok("User posts fetched", posts);
     }
 
     @GetMapping("{id}")
@@ -87,6 +95,7 @@ public class PostController {
         }
     }
 
+
     @PostMapping("/like")
     public ResponseEntity<ResponseModel> likePost(@RequestBody LikeRequest like) {
         try{
@@ -98,6 +107,18 @@ public class PostController {
         }
         catch (Exception e) {
             return ResponseModel.Fail("Error occured", HttpStatus.INTERNAL_SERVER_ERROR);
+
+    @GetMapping("search")
+    public ResponseEntity<ResponseModel> SearchPosts(@RequestParam(name = "keyword", required = false) String keyword )  // @RequestParam(name = "userId", required = false) String userId
+    //@ModelAttribute SearchPostRequest request
+    {
+        var request = new SearchPostRequest(keyword);
+        try{
+            var posts= postService.SearchPosts(request);
+            return ResponseModel.Ok("Posts fetched", posts);
+        } catch (Exception e){
+            return  ResponseModel.Fail("Error occured", HttpStatus.INTERNAL_SERVER_ERROR);
+
         }
     }
 }

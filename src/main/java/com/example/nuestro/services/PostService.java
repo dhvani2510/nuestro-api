@@ -5,6 +5,7 @@ import com.example.nuestro.entities.Like;
 import com.example.nuestro.entities.datatypes.DatabaseType;
 import com.example.nuestro.models.post.PostRequest;
 import com.example.nuestro.models.post.PostResponse;
+import com.example.nuestro.models.post.SearchPostRequest;
 import com.example.nuestro.repositories.PostRepository;
 import com.example.nuestro.repositories.LikeRepository;
 import com.example.nuestro.shared.exceptions.NuestroException;
@@ -13,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -41,7 +43,36 @@ public class PostService
 
 
     public List<PostResponse> GetPosts(){
+        logger.info("Getting posts");
         List<Post> posts= postRepository.findAll();
+        List<PostResponse> result = posts.stream()
+                .map(u -> new PostResponse(u))
+                .toList();
+        return result;
+    }
+
+    public List<PostResponse> GetPosts(String userId){
+        logger.info("Getting user {} posts", userId);
+        List<Post> posts= postRepository.findByUserId(userId);
+        List<PostResponse> result = posts.stream()
+                .map(u -> new PostResponse(u))
+                .toList();
+        return result;
+    }
+
+    public List<PostResponse> SearchPosts(SearchPostRequest searchPostRequest){
+      logger.info("Searching posts with {}", searchPostRequest.getKeyword());
+
+        long startTime = System.currentTimeMillis();
+        //StringHelper.StringIsNullOrEmpty(searchPostRequest.getUserId() )
+        //NOT working postRepository.findByContentContainingAndUser_Id(searchPostRequest.getKeyword(), searchPostRequest.getUserId());
+        List<Post> posts= postRepository.findByContentContaining(searchPostRequest.getKeyword());
+
+        long endTime = System.currentTimeMillis();
+        long executionTime = endTime - startTime;
+
+        logger.info("SearchPosts method execution time: {} milliseconds", executionTime);
+
         List<PostResponse> result = posts.stream()
                 .map(u -> new PostResponse(u))
                 .toList();
@@ -55,6 +86,7 @@ public class PostService
         return  new PostResponse(post);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public  PostResponse CreatePost(PostRequest postRequest) throws Exception {
         logger.info("User adding post with content {}",postRequest.getContent());
 
@@ -78,6 +110,7 @@ public class PostService
         return  new PostResponse(post);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public  PostResponse UpdatePost(String id, PostRequest postRequest) throws Exception {
         logger.info("User updating post {} with content {}" ,id, postRequest.getContent());
 
@@ -95,7 +128,7 @@ public class PostService
         postRepository.save(post);//synchonize
         return new PostResponse(post);
     }
-
+    @Transactional(rollbackFor = Exception.class)
     public  void Delete(String id) throws Exception {
         logger.info("User deleting post {}",id);
         var post= postRepository.findById(id)

@@ -64,15 +64,15 @@ public class DatabaseHelper
         return MongoClients.create(mongoURI);
     }
     public static MongoClient createMongoClient(User user) throws Exception {
-        var username= user.getDbUsername();
-        var password= user.getDbPassword();
+        var username= EncryptionHelper.decrypt(user.getDbUsername());
+        var password= EncryptionHelper.decrypt(user.getDbPassword());
 
         if(StringHelper.StringIsNullOrEmpty(username) && StringHelper.StringIsNullOrEmpty((password))){
             return  createMongoClient(user.getConnectionString());
         }
-        var server= user.getDbServer();
-        var port= Integer.parseInt(user.getDbPort());
-        var database= user.getDbDatabase();
+        var server= EncryptionHelper.decrypt(user.getDbServer());
+        var port= Integer.parseInt(EncryptionHelper.decrypt(user.getDbPort()));
+        var database= EncryptionHelper.decrypt(user.getDbDatabase());
 
         return createMongoClient(server,port,database,username,password);
     }

@@ -22,11 +22,13 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 @Service
@@ -70,13 +72,12 @@ public class UserService {
         return new UserModel(user);
     }
 
+    @Transactional(rollbackFor = Exception.class)
    public ProfileResponse UpdateProfile(ProfileRequest profileRequest) throws NuestroException, IOException {
        if(StringIsNullOrEmpty(profileRequest.getFirstName()))
            throw new NuestroException("First name is empty");
        if(StringIsNullOrEmpty(profileRequest.getFirstName()))
            throw new NuestroException("Last name is empty");
-       if(profileRequest.getBirthDate()==null)
-           throw new NuestroException("Birthday is null");
 
        logger.info("Getting user profile from context");
        var auth= SecurityContextHolder.getContext().getAuthentication();
@@ -89,24 +90,16 @@ public class UserService {
                .orElseThrow(()-> new NuestroException("User not found")); // name should contain the enail
        //var user= (User)auth.getPrincipal();//var user= userRepository.findById(((User)auth.getPrincipal()))
 
-       if(profileRequest.getBirthDate()!=null)
-           user.setBirthDate( profileRequest.getBirthDate());
        user.setFirstName(profileRequest.getFirstName());
        user.setLastName( profileRequest.getLastName());
-//       if(profileRequest.getDatabaseType()== DatabaseType.)
-//           throw new NuestroException("Secondary language cannot be set to english");
-
-       user.setDatabaseType(profileRequest.getDatabaseType());
-       //if(profileRequest.getImage()!=null){
-           //var image= fileService.Upload(profileRequest.getImage());
-           //user.setImage(image);
-      // }
+       
        userRepository.save(user);
 
        logger.info("User profile updated");
        return new ProfileResponse(user);
      }
 
+    @Transactional(rollbackFor = Exception.class)
     public ProfileResponse UpdateDatabase(UpdateDatabaseRequest updateDatabaseRequest) throws Exception {
 
         logger.info("User is updating database connection");
@@ -141,9 +134,9 @@ public class UserService {
 
         clientDatabase.updateUser(user);
 
-        userRepository.save(user);
         synchronizeService.synchronizeData(user.getId()); //synchornize
 
+        userRepository.save(user);
         logger.info("Database updated");
         return new ProfileResponse(user);
     }
@@ -194,6 +187,7 @@ public class UserService {
                 .orElseThrow(()-> new NuestroException("User not found"));
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public RegisterResponse register(RegisterRequest registerRequest) throws NuestroException {
 
         logger.info("User is registering with email {} and name {}", registerRequest.getEmail(), registerRequest.getFirstName());
@@ -228,10 +222,11 @@ public class UserService {
         user.setDatabaseType(DatabaseType.None);
         userRepository.save(user);
 
-        var response= new RegisterResponse(user.getId(),user.getEmail(),user.getFirstName(), user.getLastName());
+        var response= new RegisterResponse(user.getId(),user.getFirstName(), user.getLastName(),user.getEmail());
         return  response;
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public AuthenticationResponse authenticate(AuthenticationRequest authenticationRequest) throws NuestroException {
 
         var auth= SecurityContextHolder.getContext().getAuthentication();
@@ -254,6 +249,26 @@ public class UserService {
                 //.builder()
                 .setToken(jwtToken)
                 .build();
+    }
+
+
+    @Transactional(rollbackFor = Exception.class)
+    public  void Delete() throws Exception {
+        logger.info("Deleting user");
+
+        var userContext= GetUserContext();
+        var user= GetUser(userContext.getId());
+        if(!Objects.equals(userContext.getId(), user.getId()))
+            throw  new NuestroException("Not authorized to delete another user");
+
+        //Synchonize?
+//        if(user.getDatabaseType()!=DatabaseType.None){
+//            var clientDatabase= clientService.getDatabase(user);
+//            clientDatabase.deleteUser(user.getId());
+//        }
+
+        userRepository.delete(user);
+        logger.info("User deleted successfully");
     }
 
     private  void authenticate(String email, String password) throws NuestroException {

@@ -12,34 +12,19 @@ public class UserModel {
     public String id;
     public  String firstName;
     public  String lastName;
-    public LocalDate birthDate;
+
     public  String email;
 
     private String username;
 
-    public Integer age;
-    private DatabaseType databaseType;
-
     private UpdateDatabaseResponse database;
     public  UserModel(){}
 
-//    public UserModel(String id, String name, String surname, LocalDate birthDay, String email, Integer age, String imageId) {
-//        this.id = id;
-//        this.firstName= name;
-//        this.lastName= surname;
-//        this.email=email;
-//        this.birthDate = birthDay;
-//        this.age = age==null? getAge(birthDay): age;
-//        this.username= use;
-//    }
     public  UserModel(User user) {   this.id = user.getId();
         this.firstName= user.getFirstName();
         this.lastName= user.getLastName();
         this.email=user.getEmail();
-        this.birthDate = user.getBirthDate();
-        this.age = age==null? getAge(birthDate): age;
         this.username= user.getUsername();
-        this.databaseType=user.getDatabaseType();
 
         try{
             this.database= new UpdateDatabaseResponse(user);
@@ -64,14 +49,6 @@ public class UserModel {
 
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    public DatabaseType getDatabaseType() {
-        return databaseType;
-    }
-
-    public void setDatabaseType(DatabaseType databaseType) {
-        this.databaseType = databaseType;
     }
 
     public UpdateDatabaseResponse getDatabase() {

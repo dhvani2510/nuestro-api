@@ -29,8 +29,6 @@ public class User extends  BaseEntity implements UserDetails, IUser
     private  String firstName;
     @Column(name = "last_name")
     private   String lastName;
-    @Column(name = "birth_date")
-    private LocalDate birthDate;
     @Column(unique = true)
     private   String email;
 
@@ -53,19 +51,15 @@ public class User extends  BaseEntity implements UserDetails, IUser
     @Column(name = "database_type")
     @Enumerated(EnumType.STRING)
     private DatabaseType databaseType;
-    @Transient
-    private Integer age;
 
     @Enumerated(EnumType.STRING)
      private  Role role;
 
-    public  User(String name, String surname, String email, LocalDate birthDate){
+    public  User(String name, String surname, String email){
 
         this.firstName= name;
         this.lastName= surname;
         this.email=email;
-        this.birthDate = birthDate;
-        this.age =getAge();
         this.createdAt = LocalDateTime.now();
         this.role = com.example.nuestro.entities.datatypes.Role.User;
         this.setCreatedAt(LocalDateTime.now());
@@ -83,9 +77,6 @@ public class User extends  BaseEntity implements UserDetails, IUser
         this.databaseType=(databaseRequest.getType());
     }
 
-    public Integer getAge(){
-        return Period.between(this.birthDate,LocalDate.now()).getYears();
-    }
     public void setRole(Role role) {
         this.role =role;
     }
@@ -119,16 +110,6 @@ public class User extends  BaseEntity implements UserDetails, IUser
         this.lastName = lastName;
     }
 
-    @Override
-    public LocalDate getBirthDate() {
-        if(birthDate==null)
-            return  LocalDate.now();
-        return birthDate;
-    }
-
-    public void setBirthDate(LocalDate birthDate) {
-        this.birthDate = birthDate;
-    }
 
     public void setEmail(String email) {
         this.email = email;
@@ -136,10 +117,6 @@ public class User extends  BaseEntity implements UserDetails, IUser
 
     public void setConnectionString(String connectionString) {
         this.connectionString = connectionString;
-    }
-
-    public void setAge(Integer age) {
-        this.age = age;
     }
 
     @Override
@@ -197,17 +174,6 @@ public class User extends  BaseEntity implements UserDetails, IUser
         this.password = password; // encrypt
     }
 
-//    public String getImageId() {
-//        return image==null? null: image.getId();
-//    }
-//    public File getImage() {
-//        return image;
-//    }
-//
-//    public void setImage(File image) {
-//        this.image = image;
-//    }
-
     public DatabaseType getDatabaseType() {
         return databaseType;
     }
@@ -216,8 +182,8 @@ public class User extends  BaseEntity implements UserDetails, IUser
         this.databaseType = databaseType;
     }
 
-    public String getDbServer() throws Exception {
-        return EncryptionHelper.decrypt(dbServer);
+    public String getDbServer()  {
+        return dbServer;
     }
 
     public void setDbServer(String db_server) {
@@ -225,7 +191,7 @@ public class User extends  BaseEntity implements UserDetails, IUser
     }
 
     public String getDbPort() throws Exception {
-        return EncryptionHelper.decrypt(dbPort);
+        return dbPort;
     }
 
     public void setDbPort(String db_port) {
@@ -233,7 +199,7 @@ public class User extends  BaseEntity implements UserDetails, IUser
     }
 
     public String getDbDatabase() throws Exception {
-        return EncryptionHelper.decrypt(dbDatabase);
+        return dbDatabase;
     }
 
     public void setDbDatabase(String db_database) {
@@ -241,7 +207,7 @@ public class User extends  BaseEntity implements UserDetails, IUser
     }
 
     public String getDbUsername() throws Exception {
-        return EncryptionHelper.decrypt(dbUsername);
+        return dbUsername;
     }
 
     public void setDbUsername(String db_username) {
@@ -249,7 +215,7 @@ public class User extends  BaseEntity implements UserDetails, IUser
     }
 
     public String getDbPassword() throws Exception {
-        return EncryptionHelper.decrypt(dbPassword);
+        return dbPassword;
     }
 
     public void setDbPassword(String db_password) {
@@ -261,11 +227,11 @@ public class User extends  BaseEntity implements UserDetails, IUser
     }
 
     private String GenerateConnectionString(DatabaseType databaseType) throws Exception {
-        var server = getDbServer();
-        var port = Integer.parseInt(getDbPort());
-        var database = getDbDatabase();
-        var username = getDbUsername();
-        var password = getDbPassword();
+        var server = EncryptionHelper.decrypt(getDbServer());
+        var port = Integer.parseInt(EncryptionHelper.decrypt(getDbPort()));
+        var database = EncryptionHelper.decrypt(getDbDatabase());
+        var username = EncryptionHelper.decrypt(getDbUsername());
+        var password = EncryptionHelper.decrypt(getDbPassword());
 
         return switch (databaseType) {
             case MYSQL -> DatabaseHelper.GenerateMySQLConnectionString(server, port, database, username, password);
