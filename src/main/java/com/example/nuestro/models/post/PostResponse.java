@@ -1,5 +1,6 @@
 package com.example.nuestro.models.post;
 
+import com.example.nuestro.entities.Like;
 import com.example.nuestro.entities.Post;
 import com.example.nuestro.models.users.ProfileResponse;
 
@@ -8,6 +9,7 @@ public class PostResponse
     private String Id;
     private  String Content;
     private ProfileResponse User;
+    private  int Likes;
 
     public PostResponse(String id, String content) {
         Id = id;
@@ -17,6 +19,8 @@ public class PostResponse
         Id= post.getId();
         Content=post.getContent();
         User= new ProfileResponse(post.getUser());
+        if(post.getLikes()!=null)
+        Likes= post.getLikes().size();
     }
 
     public String getId() {
@@ -41,5 +45,13 @@ public class PostResponse
 
     public void setUser(ProfileResponse user) {
         User = user;
+    }
+
+    public int getLikes() {
+        return Likes;
+    }
+
+    public void setLikes(int likes) {
+        Likes = likes;
     }
 }

@@ -1,4 +1,5 @@
 package com.example.nuestro.controllers;
+import com.example.nuestro.entities.Post;
 import com.example.nuestro.models.ResponseModel;
 import com.example.nuestro.models.post.PostRequest;
 import com.example.nuestro.models.post.SearchPostRequest;
@@ -93,6 +94,18 @@ public class PostController {
         }
     }
 
+    @PostMapping("{id}/like")
+    public ResponseEntity<ResponseModel> likePost(@PathVariable String id) {
+        try {
+            var like = postService.LikePost(id);
+            return ResponseModel.Ok("Post liked", like);
+        } catch (NuestroException e) {
+            return ResponseModel.Fail(e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return ResponseModel.Fail("Error occured", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @GetMapping("search")
     public ResponseEntity<ResponseModel> SearchPosts(@RequestParam(name = "keyword", required = false) String keyword )  // @RequestParam(name = "userId", required = false) String userId
     //@ModelAttribute SearchPostRequest request
@@ -103,6 +116,7 @@ public class PostController {
             return ResponseModel.Ok("Posts fetched", posts);
         } catch (Exception e){
             return  ResponseModel.Fail("Error occured", HttpStatus.INTERNAL_SERVER_ERROR);
+
         }
     }
 }

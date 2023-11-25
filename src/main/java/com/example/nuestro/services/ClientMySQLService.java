@@ -1,5 +1,6 @@
 package com.example.nuestro.services;
 
+import com.example.nuestro.entities.Like;
 import com.example.nuestro.entities.Post;
 import com.example.nuestro.entities.User;
 import com.example.nuestro.services.interfaces.IClientDatabase;
@@ -98,6 +99,19 @@ public class ClientMySQLService implements IClientDatabase
     public void deletePost(String postId) {
         String sql = "DELETE FROM posts WHERE id = ?";
         jdbcTemplate.update(sql, postId);
+    }
+
+    //TODO check this
+    public void addLike(Like like) {
+        String sql = "INSERT INTO likes (id, created_at, creator_id, post_id, user_id) VALUES (?, ?, ?, ?, ?)";
+        jdbcTemplate.update(
+                sql,
+                like.getId(),
+                like.getCreatedAt(),
+                like.getCreatorId(),
+                like.getPost().getId(),
+                like.getUser().getId()
+        );
     }
 
     public User getUserById2(String userId) {
