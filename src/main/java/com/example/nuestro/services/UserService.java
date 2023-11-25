@@ -77,7 +77,7 @@ public class UserService {
    public ProfileResponse UpdateProfile(ProfileRequest profileRequest) throws NuestroException, IOException {
        if(StringIsNullOrEmpty(profileRequest.getFirstName()))
            throw new NuestroException("First name is empty");
-       if(StringIsNullOrEmpty(profileRequest.getFirstName()))
+       if(StringIsNullOrEmpty(profileRequest.getLastName()))
            throw new NuestroException("Last name is empty");
 
        logger.info("Getting user profile from context");
