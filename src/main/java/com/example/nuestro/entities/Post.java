@@ -15,11 +15,9 @@ import java.util.UUID;
         ,indexes = @Index(name = "content_index",columnList = "content")
 )
 @EntityListeners(AuditListener.class)
-//@Document(collection = "posts")
 public class Post extends  BaseEntity  implements IPost
 {
     @Id
-    //@Indexed(unique=true)
     @GeneratedValue(strategy= GenerationType.UUID)
     private String id;
     private  String content;
@@ -45,6 +43,7 @@ public class Post extends  BaseEntity  implements IPost
     public void Set(PostRequest translationRequest) {
       this.content=translationRequest.getContent();
       this.setUpdatedAt(LocalDateTime.now());
+      this.setUpdaterId(user.getId());
     }
 
     public String getContent() {

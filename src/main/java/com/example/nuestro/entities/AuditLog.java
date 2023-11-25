@@ -1,5 +1,6 @@
 package com.example.nuestro.entities;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.*;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -18,11 +19,11 @@ public class AuditLog {
 
     private String entityName; // Name of the audited entity
     private String entityId; // ID of the audited entity
-
+    private String action;
     private String createdBy;
-
     private LocalDateTime createdAt;
-
+    @Lob
+    private String old_value;
     public Long getId() {
         return id;
     }
@@ -82,7 +83,16 @@ public class AuditLog {
     private String updatedBy;
 
     private LocalDateTime updatedAt;
-
-    // ... other fields to capture additional audit information
-
+    public String getAction() {
+        return action;
+    }
+    public void setAction(String action) {
+        this.action = action;
+    }
+    public String getOld_value() {
+        return old_value;
+    }
+    public void setOld_value(String oldValue) {
+        this.old_value = oldValue;
+    }
 }
