@@ -1,16 +1,21 @@
 package com.example.nuestro.services;
 
 import com.example.nuestro.entities.Post;
+import com.example.nuestro.entities.Like;
 import com.example.nuestro.entities.datatypes.DatabaseType;
 import com.example.nuestro.models.post.PostRequest;
 import com.example.nuestro.models.post.PostResponse;
 import com.example.nuestro.repositories.PostRepository;
+import com.example.nuestro.repositories.LikeRepository;
 import com.example.nuestro.shared.exceptions.NuestroException;
 import com.example.nuestro.shared.helpers.StringHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import javax.xml.crypto.Data;
 import java.util.List;
@@ -22,6 +27,7 @@ public class PostService
     private  final  UserService userService;
     private  final ClientDatabaseService clientService;
     private static final Logger logger= LoggerFactory.getLogger(PostService.class);
+
     @Autowired
     public PostService(PostRepository postRepository, UserService userService, ClientDatabaseService clientService){
 
@@ -29,6 +35,10 @@ public class PostService
         this.userService = userService;
         this.clientService = clientService;
     }
+
+    @Autowired
+    private LikeRepository likeRepository;
+
 
     public List<PostResponse> GetPosts(){
         List<Post> posts= postRepository.findAll();
@@ -103,6 +113,22 @@ public class PostService
         if(StringHelper.StringIsNullOrEmpty(postRequest.getContent()))
             throw  new NuestroException("Content is empty");
     }
+
+    public Post updateLike(String id) throws NuestroException {
+        Post post = postRepository.findById(id)
+                .orElseThrow(()-> new NuestroException("Post not find"));
+        if (post != null) {
+            // Add a like to the post
+            var user= userService.GetUserContextInstance();
+            Like like = new Like(user);
+
+            like = likeRepository.save(like);
+            var post_new = postRepository.save(post);
+
+        }
+        return post;
+    }
+
 
 
 //    private void addUser(User user, JdbcTemplate jdbcTemplate) {
