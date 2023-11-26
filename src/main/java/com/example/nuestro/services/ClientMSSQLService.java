@@ -340,12 +340,12 @@ public class ClientMSSQLService implements IClientDatabase
     }
 
     public void updateComment(Comment comment) {
-        String sql = "UPDATE posts SET content = ? WHERE id = ?";
+        String sql = "UPDATE comments SET comment = ? WHERE id = ?";
         jdbcTemplate.update(sql, comment.getComment(), comment.getId());
     }
 
     public void deleteComment(String commentId) {
-        String sql = "DELETE FROM posts WHERE id = ?";
+        String sql = "DELETE FROM comments WHERE id = ?";
         jdbcTemplate.update(sql, commentId);
     }
 }

@@ -49,7 +49,7 @@ public class CommentService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public  CommentResponse CreatePost(CommentRequest commentRequest) throws Exception {
+    public  CommentResponse CreateComment(CommentRequest commentRequest) throws Exception {
         logger.info("User adding post with content {}",commentRequest.getComment());
 
         ValidateCommentRequest(commentRequest);
@@ -70,5 +70,37 @@ public class CommentService {
         }
         commentRepository.save(comment); // Synchronize
         return  new CommentResponse(comment);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public CommentResponse UpdateComment(String id, CommentRequest commentRequest) throws Exception {
+        logger.info("User updating post {} with content {}" ,id, commentRequest.getComment());
+
+        ValidateCommentRequest(commentRequest);
+
+        var comment= commentRepository.findById(id)
+                .orElseThrow(()-> new NuestroException("Comment not find"));
+
+        comment.Set(commentRequest);
+        if(comment.getUser().getDatabaseType()!= DatabaseType.None){
+            var user= userService.GetUser(comment.getUser().getId());
+            var clientDatabase= clientService.getDatabase(user);
+            clientDatabase.updatePost(comment);
+        }
+        commentRepository.save(comment);//synchonize
+        return new CommentResponse(comment);
+    }
+    @Transactional(rollbackFor = Exception.class)
+    public  void Delete(String id) throws Exception {
+        logger.info("User deleting comment {}",id);
+        var comment= commentRepository.findById(id)
+                .orElseThrow(()-> new NuestroException("Comment not find"));
+        //post.setDeletedAt(LocalDateTime.now()) ; postRepository.save(post);
+        //clientService.deletePost(post.getId());
+        var user= userService.GetUser(comment.getUser().getId());
+        var clientDatabase= clientService.getDatabase(user);
+        clientDatabase.deletePost(comment.getId());
+        commentRepository.delete(comment); //Synchonize
+        logger.info("Comment deleted successfully");
     }
 }
