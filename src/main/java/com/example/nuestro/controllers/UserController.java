@@ -45,12 +45,8 @@ public class UserController {
         }
     }
 
-    @RequestMapping(
-            path = "profile",
-            method = RequestMethod.POST,
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
-    )
-    public ResponseEntity<ResponseModel> UpdateProfile(@ModelAttribute ProfileRequest profileRequest)
+    @PostMapping("profile")
+    public ResponseEntity<ResponseModel> UpdateProfile(@RequestBody ProfileRequest profileRequest)
     {
         try{
             var user= userService.UpdateProfile(profileRequest);

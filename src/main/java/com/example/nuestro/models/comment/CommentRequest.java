@@ -7,7 +7,7 @@ public class CommentRequest {
         return comment;
     }
 
-    public void setComment(String content) {
+    public void setComment(String comment) {
         this.comment = comment;
     }
 }

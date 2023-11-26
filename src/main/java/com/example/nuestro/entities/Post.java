@@ -22,7 +22,7 @@ public class Post extends  BaseEntity  implements IPost
     private String id;
     private  String content;
     @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(unique = false)
+    @JoinColumn(unique = false, name = "user_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
@@ -30,6 +30,11 @@ public class Post extends  BaseEntity  implements IPost
     @JoinColumn(unique = false, name = "post_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Like> Likes;
+
+    @OneToMany(cascade = CascadeType.PERSIST)
+    @JoinColumn(unique = false, name = "post_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private List<Comment> Comments;
 
     public Post() {}
     public Post(String content, User user) {
@@ -75,5 +80,8 @@ public class Post extends  BaseEntity  implements IPost
 
     public void setLikes(List<Like> likes) {
         Likes = likes;
+    }
+    public List<Comment> getComments() {
+        return Comments;
     }
 }

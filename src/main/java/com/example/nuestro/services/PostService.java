@@ -96,6 +96,14 @@ public class PostService
         return  new PostResponse(post);
     }
 
+    public  Post GetPostInstance(String id) throws NuestroException {
+        logger.info("Getting post {}", id);
+        var post= postRepository.findById(id)
+                .orElseThrow(()-> new NuestroException("Post not found"));
+        return post;
+    }
+
+
     @Transactional(rollbackFor = Exception.class)
     public  PostResponse CreatePost(PostRequest postRequest) throws Exception {
         logger.info("User adding post with content {}",postRequest.getContent());

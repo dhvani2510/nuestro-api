@@ -8,7 +8,6 @@ public class CommentResponse {
     private String Id;
     private  String Comment;
     private ProfileResponse User;
-    private  int Likes;
 
     public CommentResponse(String id, String comment) {
         Id = id;

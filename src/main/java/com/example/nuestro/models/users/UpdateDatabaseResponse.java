@@ -2,6 +2,7 @@ package com.example.nuestro.models.users;
 
 import com.example.nuestro.entities.User;
 import com.example.nuestro.entities.datatypes.DatabaseType;
+import com.example.nuestro.shared.helpers.EncryptionHelper;
 
 public class UpdateDatabaseResponse
 {
@@ -14,12 +15,12 @@ public class UpdateDatabaseResponse
     public UpdateDatabaseResponse() {
     }
 
-    public UpdateDatabaseResponse(User user) throws Exception {
-        this.server = user.getDbServer();
-        this.username = user.getDbUsername();
-        this.port = user.getDbPort();
-        this.type = user.getDatabaseType();
-        this.database=user.getDbDatabase();
+    public UpdateDatabaseResponse(User user, boolean decrypt) throws Exception {
+        this.server = decrypt? EncryptionHelper.decrypt(user.getDbServer()): user.getDbServer();
+        this.username = decrypt? EncryptionHelper.decrypt(user.getDbUsername()):  user.getDbUsername();
+        this.port = decrypt? EncryptionHelper.decrypt(user.getDbPort()):  user.getDbPort();
+        this.database= decrypt? EncryptionHelper.decrypt(user.getDbDatabase()): user.getDbDatabase();
+        this.type =  user.getDatabaseType();
     }
 
     public String getServer() {

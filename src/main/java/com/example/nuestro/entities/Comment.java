@@ -1,6 +1,7 @@
 package com.example.nuestro.entities;
 
 import com.example.nuestro.entities.interfaces.IComment;
+import com.example.nuestro.models.comment.CommentRequest;
 import com.example.nuestro.models.post.PostRequest;
 import jakarta.persistence.*;
 import org.hibernate.annotations.OnDelete;
@@ -20,24 +21,28 @@ public class Comment extends BaseEntity implements IComment {
 
     private  String comment;
     @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(unique = false)
+    @JoinColumn(unique = false, name = "user_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
-    private Post post_id;
+
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(unique = false, name = "post_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Post post;
 
     public Comment() {}
 
     public Comment(String content, User user, Post post) {
         this.id= UUID.randomUUID().toString();
         this.setCreatorId(user.getId());
-        this.comment = comment;
+        this.comment = content;
         this.user= user;
-        this.post_id = post;
+        this.post = post;
         this.setCreatedAt(LocalDateTime.now());
     }
-    public void Set(PostRequest translationRequest) {
-        this.comment=translationRequest.getContent();
-        this.setCreatedAt(LocalDateTime.now());
+    public void Set(CommentRequest commentRequest) {
+        this.comment=commentRequest.getComment();
+        this.updatedAt=LocalDateTime.now();
     }
 
     public String getComment() {
@@ -64,11 +69,11 @@ public class Comment extends BaseEntity implements IComment {
     }
 
     public Post getPost() {
-        return post_id;
+        return post;
     }
 
     public void setPost(Post post) {
-        this.post_id = post;
+        this.post = post;
     }
 
 }
