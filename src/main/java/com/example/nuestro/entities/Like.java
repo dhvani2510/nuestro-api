@@ -2,12 +2,14 @@ package com.example.nuestro.entities;
 
 import com.example.nuestro.entities.interfaces.ILike;
 import com.example.nuestro.models.post.PostRequest;
+import com.example.nuestro.services.AuditListener;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
 @Table(name = "likes")
+@EntityListeners(AuditListener.class)
 public class Like extends BaseEntity implements ILike {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

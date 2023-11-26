@@ -1,6 +1,7 @@
 package com.example.nuestro.services;
 
 import com.example.nuestro.entities.AuditLog;
+import com.example.nuestro.entities.Like;
 import com.example.nuestro.entities.Post;
 import com.example.nuestro.entities.User;
 import com.example.nuestro.shared.exceptions.NuestroException;
@@ -10,9 +11,9 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -25,7 +26,7 @@ public class AuditListener extends AuditingEntityListener {
     private EntityManager entityManager;
     @PostLoad
     public void postLoad(Object entity) {
-        if (entity instanceof User || entity instanceof Post) {
+        if (entity instanceof User || entity instanceof Post || entity instanceof Like) {
             initialStates.put(entity, deepCopy(entity));
         }
     }
@@ -108,7 +109,6 @@ public class AuditListener extends AuditingEntityListener {
         // Handle pre-update event (entity modification)
         String oldValues = getOldValues(entity);
         logAudit(entity, oldValues, "UPDATE");
-
     }
 
     @PostPersist
@@ -128,22 +128,27 @@ public class AuditListener extends AuditingEntityListener {
         AuditLog auditLog = new AuditLog();
         auditLog.setEntityName(entity.getClass().getSimpleName());
         auditLog.setOld_value(oldValue);
+        auditLog.setAction(action);
+
         if (entity instanceof User) {
             User auditedEntity = (User) entity;
             auditLog.setEntityId(auditedEntity.getId());
-            auditLog.setCreatedBy(getDetail());
-            auditLog.setCreatedAt(auditedEntity.getCreatedAt());
-            auditLog.setUpdatedBy(auditedEntity.getUpdaterId());
-            auditLog.setUpdatedAt(auditedEntity.getUpdatedAt());
+            auditLog.setActionBy(getDetail());
+            auditLog.setActionAt(LocalDateTime.now());
             entityManager.persist(auditLog);
         }
         else  if(entity instanceof Post) {
             Post auditedEntity = (Post) entity;
             auditLog.setEntityId(auditedEntity.getId());
-            auditLog.setCreatedBy(getDetail());
-            auditLog.setCreatedAt(auditedEntity.getCreatedAt());
-            auditLog.setUpdatedBy(auditedEntity.getUpdaterId());
-            auditLog.setUpdatedAt(auditedEntity.getUpdatedAt());
+            auditLog.setActionBy(getDetail());
+            auditLog.setActionAt(LocalDateTime.now());
+            entityManager.persist(auditLog);
+        }
+        else  if(entity instanceof Like) {
+            Like auditedEntity = (Like) entity;
+            auditLog.setEntityId(auditedEntity.getId());
+            auditLog.setActionBy(getDetail());
+            auditLog.setActionAt(LocalDateTime.now());
             entityManager.persist(auditLog);
         }
         else

@@ -1,14 +1,8 @@
 package com.example.nuestro.entities;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.*;
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Entity
 public class AuditLog {
@@ -20,8 +14,8 @@ public class AuditLog {
     private String entityName; // Name of the audited entity
     private String entityId; // ID of the audited entity
     private String action;
-    private String createdBy;
-    private LocalDateTime createdAt;
+    private String actionBy;
+    private LocalDateTime actionAt;
     @Lob
     private String old_value;
     public Long getId() {
@@ -48,41 +42,22 @@ public class AuditLog {
         this.entityId = entityId;
     }
 
-    public String getCreatedBy() {
-        return createdBy;
+    public String getActionBy() {
+        return actionBy;
     }
 
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
+    public void setActionBy(String actionBy) {
+        this.actionBy = actionBy;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
+    public LocalDateTime getActionAt() {
+        return actionAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
+    public void setActionAt(LocalDateTime actionAt) {
+        this.actionAt = actionAt;
     }
 
-    public String getUpdatedBy() {
-        return updatedBy;
-    }
-
-    public void setUpdatedBy(String updatedBy) {
-        this.updatedBy = updatedBy;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    private String updatedBy;
-
-    private LocalDateTime updatedAt;
     public String getAction() {
         return action;
     }
