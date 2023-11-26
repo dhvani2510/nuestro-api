@@ -4,12 +4,16 @@ import com.example.nuestro.entities.Like;
 import com.example.nuestro.entities.Post;
 import com.example.nuestro.models.users.ProfileResponse;
 
+import java.time.LocalDateTime;
+import java.util.Date;
+
 public class PostResponse
 {
     private String Id;
     private  String Content;
     private ProfileResponse User;
     private  int Likes;
+    private LocalDateTime createdAt;
 
     public PostResponse(String id, String content) {
         Id = id;
@@ -20,7 +24,8 @@ public class PostResponse
         Content=post.getContent();
         User= new ProfileResponse(post.getUser());
         if(post.getLikes()!=null)
-        Likes= post.getLikes().size();
+         Likes= post.getLikes().size();
+        createdAt= post.getCreatedAt();
     }
 
     public String getId() {
@@ -53,5 +58,12 @@ public class PostResponse
 
     public void setLikes(int likes) {
         Likes = likes;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 }

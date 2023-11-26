@@ -27,7 +27,7 @@ public class SynchronizeService
         var users= userRepository.findAll();
 
         for (var user : users) {
-            var posts= postRepository.findByUserId(user.getId());
+            var posts= postRepository.findByUserIdOrderByCreatedAtDesc(user.getId());
             var clientDatabase= clientService.getDatabase(user);
             clientDatabase.AddToClientDatabase(user, posts);
         }
@@ -38,7 +38,7 @@ public class SynchronizeService
         System.out.println("Async task is running in thread: " + Thread.currentThread().getName());
 
         var user= userRepository.findById(userId).orElseThrow(()-> new NuestroException("User not found"));
-        var posts= postRepository.findByUserId(user.getId());
+        var posts= postRepository.findByUserIdOrderByCreatedAtDesc(user.getId());
         var clientDatabase= clientService.getDatabase(user);
         clientDatabase.AddToClientDatabase(user, posts);
     }

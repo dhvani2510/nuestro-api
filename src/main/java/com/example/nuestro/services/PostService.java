@@ -42,32 +42,40 @@ public class PostService
     @Autowired
     private LikeRepository likeRepository;
 
-
     public List<PostResponse> GetPosts(){
         logger.info("Getting posts");
-        List<Post> posts= postRepository.findAll();
+        List<Post> posts= postRepository.findAllByOrderByCreatedAtDesc();
         List<PostResponse> result = posts.stream()
                 .map(u -> new PostResponse(u))
                 .toList();
         return result;
     }
 
-    public List<PostResponse> GetPosts(String userId){
+    public List<PostResponse> GetPosts(String userId) {
         logger.info("Getting user {} posts", userId);
-        List<Post> posts= postRepository.findByUserId(userId);
+
+        List<Post> posts = postRepository.findByUserIdOrderByCreatedAtDesc(userId);
+
         List<PostResponse> result = posts.stream()
                 .map(u -> new PostResponse(u))
                 .toList();
+
         return result;
     }
 
-    public List<PostResponse> SearchPosts(SearchPostRequest searchPostRequest){
-      logger.info("Searching posts with {}", searchPostRequest.getKeyword());
+    public List<PostResponse> SearchPosts(SearchPostRequest searchPostRequest) {
+        logger.info("Searching posts with {}", searchPostRequest.getKeyword());
 
         long startTime = System.currentTimeMillis();
-        //StringHelper.StringIsNullOrEmpty(searchPostRequest.getUserId() )
-        //NOT working postRepository.findByContentContainingAndUser_Id(searchPostRequest.getKeyword(), searchPostRequest.getUserId());
-        List<Post> posts= postRepository.findByContentContaining(searchPostRequest.getKeyword());
+
+        List<Post> posts;
+        if (!StringHelper.StringIsNullOrEmpty(searchPostRequest.getUserId())) {
+            posts = postRepository.findByContentContainingAndUser_IdOrderByCreatedAtDesc(
+                    searchPostRequest.getKeyword(), searchPostRequest.getUserId()
+            );
+        } else {
+            posts = postRepository.findByContentContainingOrderByCreatedAtDesc(searchPostRequest.getKeyword());
+        }
 
         long endTime = System.currentTimeMillis();
         long executionTime = endTime - startTime;
@@ -79,6 +87,7 @@ public class PostService
                 .toList();
         return result;
     }
+
 
     public  PostResponse GetPost(String id) throws NuestroException {
         logger.info("Getting post {}", id);
