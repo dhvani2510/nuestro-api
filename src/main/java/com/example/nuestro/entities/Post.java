@@ -2,12 +2,10 @@ package com.example.nuestro.entities;
 
 import com.example.nuestro.entities.interfaces.IPost;
 import com.example.nuestro.models.post.PostRequest;
+import com.example.nuestro.services.AuditListener;
 import jakarta.persistence.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -16,14 +14,12 @@ import java.util.UUID;
 @Table(name = "posts"
         ,indexes = @Index(name = "content_index",columnList = "content")
 )
-//@Document(collection = "posts")
+@EntityListeners(AuditListener.class)
 public class Post extends  BaseEntity  implements IPost
 {
     @Id
-    //@Indexed(unique=true)
     @GeneratedValue(strategy= GenerationType.UUID)
     private String id;
-
     private  String content;
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(unique = false)
@@ -42,10 +38,12 @@ public class Post extends  BaseEntity  implements IPost
         this.content = content;
         this.user= user;
         this.setCreatedAt(LocalDateTime.now());
+        this.creatorId=this.user.getId();
     }
     public void Set(PostRequest translationRequest) {
       this.content=translationRequest.getContent();
-      this.setCreatedAt(LocalDateTime.now());
+      this.setUpdatedAt(LocalDateTime.now());
+      this.setUpdaterId(user.getId());
     }
 
     public String getContent() {

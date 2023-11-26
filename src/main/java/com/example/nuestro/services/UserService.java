@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.security.MessageDigest;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -76,7 +77,7 @@ public class UserService {
    public ProfileResponse UpdateProfile(ProfileRequest profileRequest) throws NuestroException, IOException {
        if(StringIsNullOrEmpty(profileRequest.getFirstName()))
            throw new NuestroException("First name is empty");
-       if(StringIsNullOrEmpty(profileRequest.getFirstName()))
+       if(StringIsNullOrEmpty(profileRequest.getLastName()))
            throw new NuestroException("Last name is empty");
 
        logger.info("Getting user profile from context");
@@ -120,8 +121,8 @@ public class UserService {
         var user = userRepository.findByEmail(auth.getName())
                 .orElseThrow(()-> new NuestroException("User not found")); // name should contain the enail
         //var user= (User)auth.getPrincipal();//var user= userRepository.findById(((User)auth.getPrincipal()))
-
-
+        user.setUpdaterId(user.getCreatorId());
+        user.setUpdatedAt(LocalDateTime.now());
         user.Update(updateDatabaseRequest);
         var clientDatabase= clientService.getDatabase(user);
         var exists=clientDatabase.doesDatabaseExist(user.getDbDatabase());
