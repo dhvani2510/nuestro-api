@@ -27,7 +27,7 @@ public class UserModel {
         this.username= user.getUsername();
 
         try{
-            this.database= new UpdateDatabaseResponse(user);
+            this.database= new UpdateDatabaseResponse(user, true);
         }
         catch (Exception e){
             System.out.println(e.getMessage());

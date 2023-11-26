@@ -1,5 +1,6 @@
 package com.example.nuestro.services;
 
+import com.example.nuestro.entities.Comment;
 import com.example.nuestro.entities.Like;
 import com.example.nuestro.entities.Post;
 import com.example.nuestro.entities.User;
@@ -347,5 +348,19 @@ public class ClientMySQLService implements IClientDatabase
         if( posts!=null&& (long) posts.size() !=0){
             addRangePost(posts);
         }
+    }
+    public void addComment(Comment comment) {
+        String sql = "INSERT INTO comments (id,created_at, creator_id, comment, user_id) VALUES (?, ?, ?, ?, ?)";
+        jdbcTemplate.update(sql, comment.getId(), comment.getCreatedAt(), comment.getCreatorId(), comment.getComment(), comment.getUser().getId());
+    }
+
+    public void updateComment(Comment comment) {
+        String sql = "UPDATE comments SET comment = ? WHERE id = ?";
+        jdbcTemplate.update(sql, comment.getComment(), comment.getId());
+    }
+
+    public void deleteComment(String commentId) {
+        String sql = "DELETE FROM comments WHERE id = ?";
+        jdbcTemplate.update(sql, commentId);
     }
 }

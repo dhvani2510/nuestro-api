@@ -2,6 +2,7 @@ package com.example.nuestro.services.interfaces;
 
 import com.example.nuestro.entities.Post;
 import com.example.nuestro.entities.User;
+import com.example.nuestro.entities.Comment;
 
 import java.util.List;
 
@@ -24,4 +25,7 @@ public interface IClientDatabase
     boolean doesTableExist(String tableName);
     boolean doesDatabaseExist(String databaseName);
     void AddToClientDatabase(User user, List<Post> posts) throws Exception;
+    void addComment(Comment comment);
+    void updateComment(Comment comment);
+    void deleteComment (String commentId);
 }

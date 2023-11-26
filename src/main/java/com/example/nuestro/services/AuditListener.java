@@ -1,9 +1,6 @@
 package com.example.nuestro.services;
 
-import com.example.nuestro.entities.AuditLog;
-import com.example.nuestro.entities.Like;
-import com.example.nuestro.entities.Post;
-import com.example.nuestro.entities.User;
+import com.example.nuestro.entities.*;
 import com.example.nuestro.shared.exceptions.NuestroException;
 import jakarta.persistence.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +23,8 @@ public class AuditListener extends AuditingEntityListener {
     private EntityManager entityManager;
     @PostLoad
     public void postLoad(Object entity) {
-        if (entity instanceof User || entity instanceof Post || entity instanceof Like) {
+        if (entity instanceof User || entity instanceof Post
+                || entity instanceof Like || entity instanceof Comment) {
             initialStates.put(entity, deepCopy(entity));
         }
     }
@@ -54,7 +52,7 @@ public class AuditListener extends AuditingEntityListener {
 
 
     private String getOldValues(Object entity) {
-        if (entity instanceof User || entity instanceof Post) {
+        if (entity instanceof User || entity instanceof Post || entity instanceof Comment) {
             Object initialState = initialStates.get(entity);
             if (initialState != null) {
                 StringBuilder differences = new StringBuilder();
@@ -146,6 +144,13 @@ public class AuditListener extends AuditingEntityListener {
         }
         else  if(entity instanceof Like) {
             Like auditedEntity = (Like) entity;
+            auditLog.setEntityId(auditedEntity.getId());
+            auditLog.setActionBy(getDetail());
+            auditLog.setActionAt(LocalDateTime.now());
+            entityManager.persist(auditLog);
+        }
+        else  if(entity instanceof Comment) {
+            Comment auditedEntity = (Comment) entity;
             auditLog.setEntityId(auditedEntity.getId());
             auditLog.setActionBy(getDetail());
             auditLog.setActionAt(LocalDateTime.now());
