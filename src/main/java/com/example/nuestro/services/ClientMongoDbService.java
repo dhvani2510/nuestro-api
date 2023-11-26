@@ -1,5 +1,6 @@
 package com.example.nuestro.services;
 import com.example.nuestro.entities.Post;
+import com.example.nuestro.entities.Comment;
 import com.example.nuestro.entities.User;
 import com.example.nuestro.services.interfaces.IClientDatabase;
 import org.slf4j.Logger;
@@ -140,5 +141,17 @@ public class ClientMongoDbService implements IClientDatabase
             System.out.println("Connection is not valid: " + e.getMessage());
             return false;
         }
+    }
+    public void addComment(Comment comment) {
+        mongoTemplate.insert(comment);
+    }
+
+    public void updateComment(Comment comment) {
+        mongoTemplate.save(comment);
+    }
+
+    public void deleteComment(String commentId) {
+        Query query = new Query(Criteria.where("id").is(commentId));
+        mongoTemplate.remove(query, Comment.class);
     }
 }
