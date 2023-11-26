@@ -3,6 +3,7 @@ package com.example.nuestro.entities;
 import com.example.nuestro.entities.interfaces.IComment;
 import com.example.nuestro.models.comment.CommentRequest;
 import com.example.nuestro.models.post.PostRequest;
+import com.example.nuestro.services.AuditListener;
 import jakarta.persistence.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -12,7 +13,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "comments")
-//@
+@EntityListeners(AuditListener.class)
 public class Comment extends BaseEntity implements IComment {
 
     @Id
