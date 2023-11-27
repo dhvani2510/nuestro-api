@@ -3,6 +3,7 @@ package com.example.nuestro.services.interfaces;
 import com.example.nuestro.entities.Post;
 import com.example.nuestro.entities.User;
 import com.example.nuestro.entities.Comment;
+import  com.example.nuestro.entities.Like;
 
 import java.util.List;
 
@@ -16,6 +17,9 @@ public interface IClientDatabase
     void addPost(Post post);
     void updatePost(Post post);
     void deletePost(String postId);
+
+    void likePost(Like like);
+
     User getUserById(String userId);
     List<User> getUsers();
     void addUser(User user) throws Exception;

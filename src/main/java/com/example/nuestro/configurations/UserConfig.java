@@ -32,7 +32,7 @@ public class UserConfig {
                 );
                 String server ="iverique.com";
                 //String url = "jdbc:mysql://iverique.com:3306/Nuestro";
-                var database="Nuestro.Iverique";
+                var database="Nuestro.New" ;//"Nuestro.Iverique";
                 String username="root";
                 String password="manager1User@mysql-database";
                 var port="3306";

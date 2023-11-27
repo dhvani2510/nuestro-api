@@ -1,0 +1,20 @@
+CREATE TABLE users (
+        id VARCHAR(255) NOT NULL,
+        created_at DATETIME(6) NULL DEFAULT NULL,
+        creator_id VARCHAR(255) NULL DEFAULT NULL,
+        deleted_at DATETIME(6) NULL DEFAULT NULL,
+        birth_date DATE NULL DEFAULT NULL,
+        database_type VARCHAR(50) CHECK (database_type IN ('None', 'MYSQL', 'MONGODB', 'MSSQL')) NULL DEFAULT NULL,
+        db_database VARCHAR(255) NULL DEFAULT NULL,
+        db_password VARCHAR(255) NULL DEFAULT NULL,
+        db_port VARCHAR(255) NULL DEFAULT NULL,
+        db_server VARCHAR(255) NULL DEFAULT NULL,
+        db_username VARCHAR(255) NULL DEFAULT NULL,
+        email VARCHAR(255) NULL DEFAULT NULL,
+        first_name VARCHAR(255) NULL DEFAULT NULL,
+        last_name VARCHAR(255) NULL DEFAULT NULL,
+        password VARCHAR(255) NULL DEFAULT NULL,
+        role VARCHAR(50) CHECK (role IN ('User', 'Admin')) NULL DEFAULT NULL,
+        PRIMARY KEY (id),
+        CONSTRAINT UK_6dotkott2kjsp8vw4d0m25fb7 UNIQUE (email)
+    );

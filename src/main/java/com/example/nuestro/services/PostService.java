@@ -186,7 +186,8 @@ public class PostService
         if(post.getUser().getDatabaseType()!= DatabaseType.None){
             var clientDatabase= clientService.getDatabase(user);
             //TODO
-            //clientDatabase.likePost(like);
+            //clientDatabase.doesDatabaseExist();
+                   // .likePost(like);
         }
 
         return new LikeResponse(like.getId(), post.getId(), user.getId());

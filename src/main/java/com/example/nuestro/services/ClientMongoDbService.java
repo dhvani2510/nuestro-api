@@ -1,4 +1,5 @@
 package com.example.nuestro.services;
+import com.example.nuestro.entities.Like;
 import com.example.nuestro.entities.Post;
 import com.example.nuestro.entities.Comment;
 import com.example.nuestro.entities.User;
@@ -87,6 +88,11 @@ public class ClientMongoDbService implements IClientDatabase
     public void deletePost(String postId) {
         Query query = new Query(Criteria.where("id").is(postId));
         mongoTemplate.remove(query, Post.class);
+    }
+
+    @Override
+    public void likePost(Like like) {
+
     }
 
     public User getUserById(String userId) {

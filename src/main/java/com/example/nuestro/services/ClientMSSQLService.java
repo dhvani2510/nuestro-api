@@ -1,5 +1,6 @@
 package com.example.nuestro.services;
 
+import com.example.nuestro.entities.Like;
 import com.example.nuestro.entities.Post;
 import com.example.nuestro.entities.Comment;
 import com.example.nuestro.entities.User;
@@ -98,6 +99,11 @@ public class ClientMSSQLService implements IClientDatabase
     public void deletePost(String postId) {
         String sql = "DELETE FROM posts WHERE id = ?";
         jdbcTemplate.update(sql, postId);
+    }
+
+    @Override
+    public void likePost(Like like) {
+
     }
 
     public User getUserById2(String userId) {

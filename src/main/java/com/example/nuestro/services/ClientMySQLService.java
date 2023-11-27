@@ -103,7 +103,7 @@ public class ClientMySQLService implements IClientDatabase
     }
 
     //TODO check this
-    public void addLike(Like like) {
+    public void likePost(Like like) {
         String sql = "INSERT INTO likes (id, created_at, creator_id, post_id, user_id) VALUES (?, ?, ?, ?, ?)";
         jdbcTemplate.update(
                 sql,
@@ -202,77 +202,28 @@ public class ClientMySQLService implements IClientDatabase
 
         if(!doesTableExist("users")){
             // Create the users table
-            String createUsersTableSQL = """
-    CREATE TABLE users (
-        id VARCHAR(255) NOT NULL,
-        created_at DATETIME(6) NULL DEFAULT NULL,
-        creator_id VARCHAR(255) NULL DEFAULT NULL,
-        deleted_at DATETIME(6) NULL DEFAULT NULL,
-        birth_date DATE NULL DEFAULT NULL,
-        database_type VARCHAR(50) CHECK (database_type IN ('None', 'MYSQL', 'MONGODB', 'MSSQL')) NULL DEFAULT NULL,
-        db_database VARCHAR(255) NULL DEFAULT NULL,
-        db_password VARCHAR(255) NULL DEFAULT NULL,
-        db_port VARCHAR(255) NULL DEFAULT NULL,
-        db_server VARCHAR(255) NULL DEFAULT NULL,
-        db_username VARCHAR(255) NULL DEFAULT NULL,
-        email VARCHAR(255) NULL DEFAULT NULL,
-        first_name VARCHAR(255) NULL DEFAULT NULL,
-        last_name VARCHAR(255) NULL DEFAULT NULL,
-        password VARCHAR(255) NULL DEFAULT NULL,
-        role VARCHAR(50) CHECK (role IN ('User', 'Admin')) NULL DEFAULT NULL,
-        PRIMARY KEY (id),
-        CONSTRAINT UK_6dotkott2kjsp8vw4d0m25fb7 UNIQUE (email)
-    );
-    """;
 
-            String createUsersTableSQL2 = "CREATE TABLE IF NOT EXISTS users (" +
-                    "id VARCHAR(255) NOT NULL PRIMARY KEY," +
-                    "created_at DATETIME(6) NULL DEFAULT NULL," +
-                    "creator_id VARCHAR(255) NULL DEFAULT NULL," +
-                    "deleted_at DATETIME(6) NULL DEFAULT NULL," +
-                    "birth_date DATE NULL DEFAULT NULL," +
-                    "connection_string VARCHAR(255) NULL DEFAULT NULL," +
-                    "database_type ENUM('MYSQL','MONGODB','MSSQL') NULL DEFAULT NULL," +
-                    "db_database VARCHAR(255) NULL DEFAULT NULL," +
-                    "db_password VARCHAR(255) NULL DEFAULT NULL," +
-                    "db_port VARCHAR(255) NULL DEFAULT NULL," +
-                    "db_server VARCHAR(255) NULL DEFAULT NULL," +
-                    "db_username VARCHAR(255) NULL DEFAULT NULL," +
-                    "email VARCHAR(255) NULL DEFAULT NULL," +
-                    "first_name VARCHAR(255) NULL DEFAULT NULL," +
-                    "last_name VARCHAR(255) NULL DEFAULT NULL," +
-                    "password VARCHAR(255) NULL DEFAULT NULL," +
-                    "role ENUM('User','Admin') NULL DEFAULT NULL" +
-                    ")";
+       var createUsersTableSQL= DatabaseHelper.readResourceFile("mysql/users_create_table.sql");
+
             jdbcTemplate.execute(createUsersTableSQL);
         }
 
         if(!doesTableExist("posts")){
             // Create the posts table
-            String createPostsTableSQL2 = "CREATE TABLE IF NOT EXISTS posts (" +
-                    "id VARCHAR(255) NOT NULL PRIMARY KEY," +
-                    "created_at DATETIME(6) NULL DEFAULT NULL," +
-                    "creator_id VARCHAR(255) NULL DEFAULT NULL," +
-                    "content TEXT," +
-                    "user_id VARCHAR(255)" +
-                    ")";
-            var createPostsTableSQL = """
-    CREATE TABLE posts (
-        id VARCHAR(255) NOT NULL,
-        created_at DATETIME(6) NULL DEFAULT NULL,
-        creator_id VARCHAR(255) NULL DEFAULT NULL,
-        deleted_at DATETIME(6) NULL DEFAULT NULL,
-        content VARCHAR(255) NULL DEFAULT NULL,
-        user_id VARCHAR(255) NULL DEFAULT NULL,
-        PRIMARY KEY (id),
-        CONSTRAINT FK5lidm6cqbc7u4xhqpxm898qme FOREIGN KEY (user_id) REFERENCES users (id) ON UPDATE NO ACTION ON DELETE NO ACTION
-    );
-    """;
+            var createPostsTableSQL = DatabaseHelper.readResourceFile("mysql/posts_create_table.sql");
             var createIndexSQL = """
     CREATE INDEX FK5lidm6cqbc7u4xhqpxm898qme ON posts (user_id);
     """;
             jdbcTemplate.execute(createPostsTableSQL);
             jdbcTemplate.execute(createIndexSQL);
+        }
+        if(!doesTableExist("likes")){
+            var createLikesTableSQL= DatabaseHelper.readResourceFile("mysql/likes_create_table.sql");
+            jdbcTemplate.execute(createLikesTableSQL);
+        }
+        if(!doesTableExist("comments")){
+            var createCommentsTableSQL= DatabaseHelper.readResourceFile("mysql/comments_create_table.sql");
+            jdbcTemplate.execute(createCommentsTableSQL);
         }
     }
 
