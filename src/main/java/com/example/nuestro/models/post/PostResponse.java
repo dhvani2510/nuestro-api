@@ -2,10 +2,13 @@ package com.example.nuestro.models.post;
 
 import com.example.nuestro.entities.Like;
 import com.example.nuestro.entities.Post;
+import com.example.nuestro.models.comment.CommentResponse;
+import com.example.nuestro.models.like.LikeResponse;
 import com.example.nuestro.models.users.ProfileResponse;
 
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 
 public class PostResponse
 {
@@ -15,6 +18,10 @@ public class PostResponse
     private  int Likes;
     private LocalDateTime createdAt;
 
+    private List<ProfileResponse> Liked;
+
+    private  List<CommentResponse> Comments;
+
     public PostResponse(String id, String content) {
         Id = id;
         Content = content;
@@ -23,9 +30,16 @@ public class PostResponse
         Id= post.getId();
         Content=post.getContent();
         User= new ProfileResponse(post.getUser());
-        if(post.getLikes()!=null)
-         Likes= post.getLikes().size();
         createdAt= post.getCreatedAt();
+        if(post.getLikes()!=null){
+            Likes= post.getLikes().size();
+            Liked= post.getLikes().stream()
+                    .map(u -> new ProfileResponse (u.getUser())).toList();
+        }
+
+        if(post.getComments()!=null)
+            Comments= post.getComments().stream()
+                .map(u -> new CommentResponse(u)).toList();
     }
 
     public String getId() {
@@ -65,5 +79,21 @@ public class PostResponse
     }
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public List<ProfileResponse> getLiked() {
+        return Liked;
+    }
+
+    public void setLiked(List<ProfileResponse> liked) {
+        Liked = liked;
+    }
+
+    public List<CommentResponse> getComments() {
+        return Comments;
+    }
+
+    public void setComments(List<CommentResponse> comments) {
+        Comments = comments;
     }
 }
