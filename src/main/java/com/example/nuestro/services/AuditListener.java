@@ -127,6 +127,7 @@ public class AuditListener extends AuditingEntityListener {
         auditLog.setEntityName(entity.getClass().getSimpleName());
         auditLog.setOld_value(oldValue);
         auditLog.setAction(action);
+        System.out.println("Length of old_value: " + (oldValue != null ? oldValue.length() : 0));
 
         if (entity instanceof User) {
             User auditedEntity = (User) entity;

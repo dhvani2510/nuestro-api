@@ -6,21 +6,28 @@ CREATE TABLE `audit_log` (
     `action_by` VARCHAR(255) NULL DEFAULT NULL COLLATE 'utf8mb4_0900_ai_ci',
     `entity_id` VARCHAR(255) NULL DEFAULT NULL COLLATE 'utf8mb4_0900_ai_ci',
     `entity_name` VARCHAR(255) NULL DEFAULT NULL COLLATE 'utf8mb4_0900_ai_ci',
-    `old_value` TINYTEXT NULL DEFAULT NULL COLLATE 'utf8mb4_0900_ai_ci',
+    `old_value` TEXT NULL DEFAULT NULL COLLATE 'utf8mb4_0900_ai_ci',
     PRIMARY KEY (`id`) USING BTREE
-) COLLATE='utf8mb4_0900_ai_ci' ENGINE=InnoDB AUTO_INCREMENT=1;
+)
+COLLATE='utf8mb4_0900_ai_ci'
+ENGINE=InnoDB
+AUTO_INCREMENT=1;
+
 
 -- Create the trigger for the users table
 DELIMITER //
 CREATE TRIGGER `users_after_update` AFTER UPDATE ON `users`
 FOR EACH ROW
 BEGIN
+    DECLARE old_user_content TEXT;
+    SET old_user_content = CONCAT('Name: ', OLD.first_name, ' ', OLD.last_name, ', Email: ', OLD.email);
+
     INSERT INTO `audit_log` (
         `action`, `action_at`, `action_by`,
         `entity_id`, `entity_name`, `old_value`
     ) VALUES (
         'UPDATE', NOW(6), USER(),
-        OLD.id, 'users', CONCAT('Name: ', OLD.name, ', Email: ', OLD.email)
+        OLD.id, 'users', old_user_content
     );
 END;
 //
@@ -31,12 +38,15 @@ DELIMITER //
 CREATE TRIGGER `posts_after_update` AFTER UPDATE ON `posts`
 FOR EACH ROW
 BEGIN
+    DECLARE old_post_content TEXT;
+    SET old_post_content = CONCAT('Content: ', OLD.content);
+
     INSERT INTO `audit_log` (
         `action`, `action_at`, `action_by`,
         `entity_id`, `entity_name`, `old_value`
     ) VALUES (
         'UPDATE', NOW(6), USER(),
-        OLD.id, 'posts', CONCAT('Title: ', OLD.title, ', Content: ', OLD.content)
+        OLD.id, 'posts', old_post_content
     );
 END;
 //
@@ -47,12 +57,15 @@ DELIMITER //
 CREATE TRIGGER `comments_after_update` AFTER UPDATE ON `comments`
 FOR EACH ROW
 BEGIN
+    DECLARE old_comment_content TEXT;
+    SET old_comment_content = CONCAT('Content: ', OLD.comment);
+
     INSERT INTO `audit_log` (
         `action`, `action_at`, `action_by`,
         `entity_id`, `entity_name`, `old_value`
     ) VALUES (
         'UPDATE', NOW(6), USER(),
-        OLD.id, 'comments', CONCAT('Content: ', OLD.content)
+        OLD.id, 'comments', old_comment_content
     );
 END;
 //
@@ -63,6 +76,8 @@ DELIMITER //
 CREATE TRIGGER `likes_after_update` AFTER UPDATE ON `likes`
 FOR EACH ROW
 BEGIN
+    -- No need to declare a variable for likes as the old value is set to NULL
+
     INSERT INTO `audit_log` (
         `action`, `action_at`, `action_by`,
         `entity_id`, `entity_name`, `old_value`

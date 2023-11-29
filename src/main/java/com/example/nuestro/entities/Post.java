@@ -4,6 +4,7 @@ import com.example.nuestro.entities.interfaces.IPost;
 import com.example.nuestro.models.post.PostRequest;
 import com.example.nuestro.services.AuditListener;
 import jakarta.persistence.*;
+import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import java.time.LocalDateTime;
@@ -18,13 +19,20 @@ import java.util.UUID;
 public class Post extends  BaseEntity  implements IPost
 {
     @Id
-    @GeneratedValue(strategy= GenerationType.UUID)
+    //@GeneratedValue(generator = "uuid")
+    //@GenericGenerator(name = "uuid", strategy = "org.hibernate.id.UUIDGenerator")
+    @Column(name = "id", updatable = false, nullable = false)
+    @GeneratedValue(strategy= GenerationType.UUID) //GenerationType.UUID GenerationType.IDENTITY
     private String id;
     private  String content;
     @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(unique = false, name = "user_id")
+   // @JoinColumn(unique = false, name = "user_id")
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
+
+    @Column(name = "user_id", insertable = false, updatable = false)
+    private String userId;
 
     @OneToMany(cascade = CascadeType.PERSIST)
     @JoinColumn(unique = false, name = "post_id")
@@ -83,5 +91,9 @@ public class Post extends  BaseEntity  implements IPost
     }
     public List<Comment> getComments() {
         return Comments;
+    }
+
+    public String getUserId() {
+        return userId;
     }
 }

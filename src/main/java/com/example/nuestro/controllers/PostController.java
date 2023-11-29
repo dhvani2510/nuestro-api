@@ -5,6 +5,8 @@ import com.example.nuestro.models.post.PostRequest;
 import com.example.nuestro.models.post.SearchPostRequest;
 import com.example.nuestro.services.PostService;
 import com.example.nuestro.shared.exceptions.NuestroException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 public class PostController {
 
     private  final PostService postService;
+    private static final Logger logger= LoggerFactory.getLogger(PostController.class);
     @Autowired
     public PostController(PostService postService) {
         this.postService = postService;
@@ -60,6 +63,7 @@ public class PostController {
             return  ResponseModel.Fail(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
         catch (Exception e){
+            logger.error(e.getMessage(), e.getCause());
             return  ResponseModel.Fail("Error occured", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -98,10 +102,11 @@ public class PostController {
     public ResponseEntity<ResponseModel> likePost(@PathVariable String id) {
         try {
             var like = postService.LikePost(id);
-            return ResponseModel.Ok("Post liked", like);
+            return   ResponseModel.Ok(like ==null?  "Post unliked":"Post liked", like);
         } catch (NuestroException e) {
             return ResponseModel.Fail(e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
+            logger.error(e.getMessage(), e.getCause());
             return ResponseModel.Fail("Error occured", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

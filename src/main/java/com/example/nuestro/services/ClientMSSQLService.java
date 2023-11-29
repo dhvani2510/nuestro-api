@@ -106,6 +106,21 @@ public class ClientMSSQLService implements IClientDatabase
 
     }
 
+    @Override
+    public void deleteLike(String likeId) {
+
+    }
+
+    @Override
+    public List<Like> getLikes() {
+        return null;
+    }
+
+    @Override
+    public List<Comment> getComments() {
+        return null;
+    }
+
     public User getUserById2(String userId) {
         String sql = "SELECT * FROM users WHERE id = ?";
         return jdbcTemplate.queryForObject(sql, new Object[]{userId}, new BeanPropertyRowMapper<>(User.class));

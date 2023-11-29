@@ -95,6 +95,21 @@ public class ClientMongoDbService implements IClientDatabase
 
     }
 
+    @Override
+    public void deleteLike(String likeId) {
+
+    }
+
+    @Override
+    public List<Like> getLikes() {
+        return null;
+    }
+
+    @Override
+    public List<Comment> getComments() {
+        return null;
+    }
+
     public User getUserById(String userId) {
         Query query = new Query(Criteria.where("id").is(userId));
         return mongoTemplate.findOne(query, User.class);

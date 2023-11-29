@@ -1,10 +1,17 @@
-    CREATE TABLE posts (
-        id VARCHAR(255) NOT NULL,
-        created_at DATETIME(6) NULL DEFAULT NULL,
-        creator_id VARCHAR(255) NULL DEFAULT NULL,
-        deleted_at DATETIME(6) NULL DEFAULT NULL,
-        content VARCHAR(255) NULL DEFAULT NULL,
-        user_id VARCHAR(255) NULL DEFAULT NULL,
-        PRIMARY KEY (id),
-        CONSTRAINT FK5lidm6cqbc7u4xhqpxm898qme FOREIGN KEY (user_id) REFERENCES users (id) ON UPDATE NO ACTION ON DELETE NO ACTION
-    );
+CREATE TABLE `posts` (
+	`id` VARCHAR(255) NOT NULL COLLATE 'utf8mb4_0900_ai_ci',
+	`created_at` DATETIME(6) NULL DEFAULT NULL,
+	`creator_id` VARCHAR(255) NULL DEFAULT NULL COLLATE 'utf8mb4_0900_ai_ci',
+	`deleted_at` DATETIME(6) NULL DEFAULT NULL,
+	`updated_at` DATETIME(6) NULL DEFAULT NULL,
+	`updater_id` VARCHAR(255) NULL DEFAULT NULL COLLATE 'utf8mb4_0900_ai_ci',
+	`content` VARCHAR(255) NULL DEFAULT NULL COLLATE 'utf8mb4_0900_ai_ci',
+	`user_id` VARCHAR(255) NULL DEFAULT NULL COLLATE 'utf8mb4_0900_ai_ci',
+	PRIMARY KEY (`id`) USING BTREE,
+	INDEX `content_index` (`content`) USING BTREE,
+	INDEX `FK5lidm6cqbc7u4xhqpxm898qme` (`user_id`) USING BTREE,
+	CONSTRAINT `FK5lidm6cqbc7u4xhqpxm898qme` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON UPDATE NO ACTION ON DELETE CASCADE
+)
+COLLATE='utf8mb4_0900_ai_ci'
+ENGINE=InnoDB
+;

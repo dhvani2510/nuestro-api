@@ -120,12 +120,12 @@ public class PostService
 
         //jdbcTemplate.setDataSource(userDataSource);
 
+        postRepository.save(post); // server then client because of id being generated on save
         if(user.getDatabaseType()!= DatabaseType.None){
             var clientDatabase= clientService.getDatabase(user);
             clientDatabase.addPost(post);
         }
-        postRepository.save(post); // Synchronize
-        return  new PostResponse(post);
+        return new PostResponse(post);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -135,7 +135,7 @@ public class PostService
         ValidatePostRequest(postRequest);
 
         var post= postRepository.findById(id)
-                .orElseThrow(()-> new NuestroException("Post not find"));
+                .orElseThrow(()-> new NuestroException("Post not found"));
 
         post.Set(postRequest);
         post.setUpdaterId(post.getUser().getId());
@@ -151,12 +151,14 @@ public class PostService
     public  void Delete(String id) throws Exception {
         logger.info("User deleting post {}",id);
         var post= postRepository.findById(id)
-                .orElseThrow(()-> new NuestroException("Post not find"));
+                .orElseThrow(()-> new NuestroException("Post not found"));
         //post.setDeletedAt(LocalDateTime.now()) ; postRepository.save(post);
-       //clientService.deletePost(post.getId());
-        var user= userService.GetUser(post.getUser().getId());
-        var clientDatabase= clientService.getDatabase(user);
-        clientDatabase.deletePost(post.getId());
+
+        if(post.getUser().getDatabaseType()!= DatabaseType.None){
+            var user= userService.GetUser(post.getUser().getId());
+            var clientDatabase= clientService.getDatabase(user);
+            clientDatabase.deletePost(post.getId());
+        }
         postRepository.delete(post); //Synchonize
         logger.info("Post deleted successfully");
     }
@@ -172,22 +174,30 @@ public class PostService
         logger.info("User likes post {}", id);
 
         Post post = postRepository.findById(id)
-                .orElseThrow(()-> new NuestroException("Post not find"));
+                .orElseThrow(()-> new NuestroException("Post not found"));
         // Add a like to the post
         var user= userService.GetUserContextInstance();
 
         //check if the post was already liked
         var liked= likeRepository.findByPost_IdAndUser_Id(post.getId(),user.getId());
-        if(liked!= null)
-            throw new NuestroException("User already liked post");
+        if(liked!= null){
+            // unlike
+            if(post.getUser().getDatabaseType()!= DatabaseType.None){
+                var clientDatabase= clientService.getDatabase(user);
+                clientDatabase.deleteLike(liked.getId());
+            }
+            likeRepository.delete(liked);
+            logger.info("Like deleted successfully");
+            return null;
+        }
+
 
         var like = new Like(user, post);
+
         likeRepository.save(like);
         if(post.getUser().getDatabaseType()!= DatabaseType.None){
             var clientDatabase= clientService.getDatabase(user);
-            //TODO
-            //clientDatabase.doesDatabaseExist();
-                   // .likePost(like);
+            clientDatabase.likePost(like);
         }
 
         return new LikeResponse(like.getId(), post.getId(), user.getId());

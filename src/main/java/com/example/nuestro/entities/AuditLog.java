@@ -17,6 +17,7 @@ public class AuditLog {
     private String actionBy;
     private LocalDateTime actionAt;
     @Lob
+    @Column(length = 1000)
     private String old_value;
     public Long getId() {
         return id;

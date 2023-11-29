@@ -6,7 +6,6 @@ import com.example.nuestro.entities.Post;
 import com.example.nuestro.entities.User;
 import com.example.nuestro.services.interfaces.IClientDatabase;
 import com.example.nuestro.shared.helpers.DatabaseHelper;
-import jdk.jshell.spi.ExecutionControl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -18,8 +17,9 @@ import org.springframework.stereotype.Service;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.SQLSyntaxErrorException;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class ClientMySQLService implements IClientDatabase
@@ -37,7 +37,7 @@ public class ClientMySQLService implements IClientDatabase
     public  void setDatabase(JdbcTemplate jdbcTemplate, User user) throws Exception {
 
         this.jdbcTemplate= jdbcTemplate;
-        createDatabaseAndTables(user.getDbDatabase());
+        createDatabaseAndTables(user.getDbDatabase()); //decrypt?
         ///var result= isConnectionValid();
     }
     public boolean isConnectionValid() {
@@ -68,8 +68,17 @@ public class ClientMySQLService implements IClientDatabase
     }
 
     public List<Post> getPosts() {
+
+        //String sql = "SELECT posts.*, users.* FROM posts INNER JOIN users ON posts.user_id = users.id";
+        //return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Post.class));
+
+
         String sql = "SELECT * FROM posts";
-        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Post.class));
+        //List<Map<String, Object>> result = jdbcTemplate.queryForList(sql);
+        var posts= jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Post.class));
+        var userIds= posts.stream().map(p->p.getUserId()).toList();
+        // var users= getUsers(userIds);
+        return posts;
     }
 
     public void addRangePost(List<Post> posts) {
@@ -115,6 +124,20 @@ public class ClientMySQLService implements IClientDatabase
         );
     }
 
+    public void deleteLike(String likeId) {
+        String sql = "DELETE FROM likes WHERE id = ?";
+       var result= jdbcTemplate.update(sql, likeId);
+    }
+
+    public List<Like> getLikes() {
+        String sql = "SELECT * FROM likes";
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Like.class));
+    }
+
+    public List<Comment> getComments() {
+        String sql = "SELECT * FROM comments";
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Comment.class));
+    }
     public User getUserById2(String userId) {
         String sql = "SELECT * FROM users WHERE id = ?";
         return jdbcTemplate.queryForObject(sql, new Object[]{userId}, new BeanPropertyRowMapper<>(User.class));
@@ -133,6 +156,21 @@ public class ClientMySQLService implements IClientDatabase
         String sql = "SELECT * FROM users";
         return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(User.class));
     }
+    public List<User> getUsers(List<String> userIds) {
+        // Check if the list is empty to avoid SQL errors
+        if (userIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // Generate a comma-separated string of user IDs for the SQL query
+        String idList = String.join(",", userIds);
+
+        // Use a parameterized query to avoid SQL injection
+        String sql = "SELECT * FROM users WHERE id IN (" + idList + ")";
+
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(User.class));
+    }
+
     public void addUser(User user) throws Exception {
         String sql = "INSERT INTO users " +
                 "(id, created_at, creator_id, deleted_at, database_type, " +
@@ -215,7 +253,7 @@ public class ClientMySQLService implements IClientDatabase
     CREATE INDEX FK5lidm6cqbc7u4xhqpxm898qme ON posts (user_id);
     """;
             jdbcTemplate.execute(createPostsTableSQL);
-            jdbcTemplate.execute(createIndexSQL);
+            //jdbcTemplate.execute(createIndexSQL);
         }
         if(!doesTableExist("likes")){
             var createLikesTableSQL= DatabaseHelper.readResourceFile("mysql/likes_create_table.sql");
@@ -225,6 +263,10 @@ public class ClientMySQLService implements IClientDatabase
             var createCommentsTableSQL= DatabaseHelper.readResourceFile("mysql/comments_create_table.sql");
             jdbcTemplate.execute(createCommentsTableSQL);
         }
+//        if(!doesTableExist("audit_log")){ //NOT working
+//            var createAuditLogsTableSQL= DatabaseHelper.readResourceFile("mysql/audit_log_create_table.sql");
+//            jdbcTemplate.execute(createAuditLogsTableSQL);
+//        }
     }
 
     public boolean doesTableExist2(String tableName) {
@@ -301,8 +343,8 @@ public class ClientMySQLService implements IClientDatabase
         }
     }
     public void addComment(Comment comment) {
-        String sql = "INSERT INTO comments (id,created_at, creator_id, comment, user_id) VALUES (?, ?, ?, ?, ?)";
-        jdbcTemplate.update(sql, comment.getId(), comment.getCreatedAt(), comment.getCreatorId(), comment.getComment(), comment.getUser().getId());
+        String sql = "INSERT INTO comments (id,created_at, creator_id, comment, user_id, post_id) VALUES (?, ?, ?, ?, ?, ?)";
+        jdbcTemplate.update(sql, comment.getId(), comment.getCreatedAt(), comment.getCreatorId(), comment.getComment(), comment.getUser().getId(), comment.getPost().getId());
     }
 
     public void updateComment(Comment comment) {
@@ -312,6 +354,6 @@ public class ClientMySQLService implements IClientDatabase
 
     public void deleteComment(String commentId) {
         String sql = "DELETE FROM comments WHERE id = ?";
-        jdbcTemplate.update(sql, commentId);
+        var result =jdbcTemplate.update(sql, commentId);
     }
 }

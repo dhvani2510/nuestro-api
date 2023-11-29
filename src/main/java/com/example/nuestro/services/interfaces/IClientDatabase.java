@@ -20,6 +20,10 @@ public interface IClientDatabase
 
     void likePost(Like like);
 
+      void deleteLike(String likeId);
+     List<Like> getLikes();
+     List<Comment> getComments();
+
     User getUserById(String userId);
     List<User> getUsers();
     void addUser(User user) throws Exception;
