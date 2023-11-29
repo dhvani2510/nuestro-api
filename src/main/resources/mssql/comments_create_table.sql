@@ -9,8 +9,8 @@ CREATE TABLE comments (
     post_id NVARCHAR(255) NULL,
     user_id NVARCHAR(255) NULL,
     PRIMARY KEY (id),
-    INDEX FKh4c7lvsc298whoyd4w9ta25cr (post_id),
-    INDEX FK8omq0tc18jd43bu5tjh6jvraq (user_id),
-    CONSTRAINT FK8omq0tc18jd43bu5tjh6jvraq FOREIGN KEY (user_id) REFERENCES users (id) ON UPDATE NO ACTION ON DELETE CASCADE,
-    CONSTRAINT FKh4c7lvsc298whoyd4w9ta25cr FOREIGN KEY (post_id) REFERENCES posts (id) ON UPDATE NO ACTION ON DELETE CASCADE
+    INDEX FK_post_id_comments (post_id),
+    INDEX FK_user_id_comments (user_id),
+    CONSTRAINT FK_user_id_comments FOREIGN KEY (user_id) REFERENCES users (id) ON UPDATE NO ACTION ON DELETE CASCADE,
+    CONSTRAINT FK_post_id_comments FOREIGN KEY (post_id) REFERENCES posts (id) ON UPDATE NO ACTION ON DELETE CASCADE
 );

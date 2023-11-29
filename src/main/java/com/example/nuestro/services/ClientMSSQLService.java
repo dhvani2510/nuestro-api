@@ -101,24 +101,34 @@ public class ClientMSSQLService implements IClientDatabase
         jdbcTemplate.update(sql, postId);
     }
 
-    @Override
     public void likePost(Like like) {
-
+        String sql = "INSERT INTO likes (id, created_at, creator_id, post_id, user_id) VALUES (?, ?, ?, ?, ?)";
+        jdbcTemplate.update(sql,
+                like.getId(),
+                like.getCreatedAt(),
+                like.getCreatorId(),
+                like.getPost().getId(),
+                like.getUser().getId()
+        );
     }
 
     @Override
     public void deleteLike(String likeId) {
-
+        String sql = "DELETE FROM likes WHERE id = ?";
+        jdbcTemplate.update(sql, likeId);
     }
 
     @Override
     public List<Like> getLikes() {
-        return null;
+        String sql = "SELECT * FROM likes";
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Like.class));
     }
 
     @Override
     public List<Comment> getComments() {
-        return null;
+
+        String sql = "SELECT * FROM comments";
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Comment.class));
     }
 
     public User getUserById2(String userId) {
@@ -214,48 +224,26 @@ public class ClientMSSQLService implements IClientDatabase
 
         if(!doesTableExist("dbo.users")){
             // Create the users table
-            String createUsersTableSQL = """
-                    CREATE TABLE users (
-                        id VARCHAR(255) NOT NULL,
-                        created_at DATETIME2(6) NULL DEFAULT NULL,
-                        creator_id VARCHAR(255) NULL DEFAULT NULL,
-                        deleted_at DATETIME2(6) NULL DEFAULT NULL,
-                        birth_date DATE NULL DEFAULT NULL,
-                        database_type VARCHAR(50) CHECK (database_type IN ('None', 'MYSQL', 'MONGODB', 'MSSQL')) NULL DEFAULT NULL,
-                        db_database VARCHAR(255) NULL DEFAULT NULL,
-                        db_password VARCHAR(255) NULL DEFAULT NULL,
-                        db_port VARCHAR(255) NULL DEFAULT NULL,
-                        db_server VARCHAR(255) NULL DEFAULT NULL,
-                        db_username VARCHAR(255) NULL DEFAULT NULL,
-                        email VARCHAR(255) NULL DEFAULT NULL,
-                        first_name VARCHAR(255) NULL DEFAULT NULL,
-                        last_name VARCHAR(255) NULL DEFAULT NULL,
-                        password VARCHAR(255) NULL DEFAULT NULL,
-                        role VARCHAR(50) CHECK (role IN ('User', 'Admin')) NULL DEFAULT NULL,
-                        PRIMARY KEY (id),
-                        CONSTRAINT UK_6dotkott2kjsp8vw4d0m25fb7 UNIQUE (email)
-                    );
-                    """;
+            var createUsersTableSQL= DatabaseHelper.readResourceFile("mssql/users_create_table.sql");
             jdbcTemplate.execute(createUsersTableSQL);
         }
-
         if(!doesTableExist("posts")){
             // Create the posts table
-
-            var createPostsTableSQL= """
-                    CREATE TABLE posts (
-                    id VARCHAR(255) NOT NULL,
-                    created_at DATETIME2(6) NULL DEFAULT NULL,
-                    creator_id VARCHAR(255) NULL DEFAULT NULL,
-                    deleted_at DATETIME2(6) NULL DEFAULT NULL,
-                    content VARCHAR(255) NULL DEFAULT NULL,
-                    user_id VARCHAR(255) NULL DEFAULT NULL,
-                    PRIMARY KEY (id),
-                    CONSTRAINT FK5lidm6cqbc7u4xhqpxm898qme FOREIGN KEY (user_id) REFERENCES users (id) ON UPDATE NO ACTION ON DELETE NO
-                    ACTION
-                    );
-                    CREATE INDEX FK5lidm6cqbc7u4xhqpxm898qme ON posts (user_id);""";
+            var createPostsTableSQL = DatabaseHelper.readResourceFile("mssql/posts_create_table.sql");
             jdbcTemplate.execute(createPostsTableSQL);
+            //jdbcTemplate.execute(createIndexSQL);
+        }
+        if(!doesTableExist("likes")){
+            var createLikesTableSQL= DatabaseHelper.readResourceFile("mssql/likes_create_table.sql");
+            jdbcTemplate.execute(createLikesTableSQL);
+        }
+        if(!doesTableExist("comments")){
+            var createCommentsTableSQL= DatabaseHelper.readResourceFile("mssql/comments_create_table.sql");
+            jdbcTemplate.execute(createCommentsTableSQL);
+        }
+        if(!doesTableExist("audit_log")){
+            var createAuditLogsTableSQL= DatabaseHelper.readResourceFile("mssql/audit_log_create_table.sql");
+            jdbcTemplate.execute(createAuditLogsTableSQL);
         }
     }
 

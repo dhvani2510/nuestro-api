@@ -241,8 +241,7 @@ public class ClientMySQLService implements IClientDatabase
         if(!doesTableExist("users")){
             // Create the users table
 
-       var createUsersTableSQL= DatabaseHelper.readResourceFile("mysql/users_create_table.sql");
-
+           var createUsersTableSQL= DatabaseHelper.readResourceFile("mysql/users_create_table.sql");
             jdbcTemplate.execute(createUsersTableSQL);
         }
 

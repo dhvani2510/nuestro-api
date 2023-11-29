@@ -44,10 +44,10 @@ public class UserConfig {
                 //ives.setRole(Role.Admin);
 
                 AddUser(userService, clientService, ives, GetMySQLDbDatabase());
-                //ives.setEmail("test@test.com"); ives.setFirstName("test"); ives.setLastName("test");
-                //AddUser(userService,clientService,ives, GetMongoDbDatabase());
-                //ives.setEmail("test1@test.com"); ives.setFirstName("test"); ives.setLastName("test");
-                //AddUser(userService,clientService,ives, GetMSSQLDbDatabase());
+                ives.setEmail("test@test.com"); ives.setFirstName("test"); ives.setLastName("test");
+                AddUser(userService,clientService,ives, GetMongoDbDatabase());
+                ives.setEmail("test1@test.com"); ives.setFirstName("test"); ives.setLastName("test");
+                AddUser(userService,clientService,ives, GetMSSQLDbDatabase());
             }
             catch (Exception exception){
                 System.out.println("Exception occured "+exception.getMessage());
@@ -83,10 +83,10 @@ public class UserConfig {
     }
 
     private  UpdateDatabaseRequest GetMongoDbDatabase(){
-        String server ="localhost"; //iverique.com
+        String server ="iverique.com"; //iverique.com
         var database="nuestro";
         String username="root";
-        String password="Hjdj@0389";
+        String password="ThisIsAStrongPassword";
         var port="27017";
         return new UpdateDatabaseRequest(server,port,database,username,password, DatabaseType.MONGODB);
     }
