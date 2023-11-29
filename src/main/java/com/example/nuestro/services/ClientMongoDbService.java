@@ -1,7 +1,5 @@
 package com.example.nuestro.services;
-import com.example.nuestro.entities.Post;
-import com.example.nuestro.entities.Comment;
-import com.example.nuestro.entities.User;
+import com.example.nuestro.entities.*;
 import com.example.nuestro.services.interfaces.IClientDatabase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,6 +87,29 @@ public class ClientMongoDbService implements IClientDatabase
         mongoTemplate.remove(query, Post.class);
     }
 
+    @Override
+    public void likePost(Like like) {
+       var result= mongoTemplate.insert(like);
+        logger.info("Result: "+ result.toString());
+    }
+
+    @Override
+    public void deleteLike(String likeId) {
+        Query query = new Query(Criteria.where("id").is(likeId));
+       var result=  mongoTemplate.remove(query, Like.class);
+       logger.info("Result: "+ result.toString());
+    }
+
+    @Override
+    public List<Like> getLikes() {
+        return mongoTemplate.findAll(Like.class);
+    }
+
+    @Override
+    public List<Comment> getComments() {
+        return mongoTemplate.findAll(Comment.class);
+    }
+
     public User getUserById(String userId) {
         Query query = new Query(Criteria.where("id").is(userId));
         return mongoTemplate.findOne(query, User.class);
@@ -142,16 +163,28 @@ public class ClientMongoDbService implements IClientDatabase
             return false;
         }
     }
+
+    //Use Mongo comment
     public void addComment(Comment comment) {
-        mongoTemplate.insert(comment);
+        try{
+            var mongoComment= new MongoComment(comment);
+            var result= mongoTemplate.insert(mongoComment);
+            logger.info("Result: "+ result.toString());
+        }
+        catch (Exception exception){
+            logger.error(exception.getMessage());
+        }
     }
 
     public void updateComment(Comment comment) {
-        mongoTemplate.save(comment);
+        var mongoComment= new MongoComment(comment);
+      var result=  mongoTemplate.save(mongoComment);
+        logger.info("Result: "+ result.toString());
     }
 
     public void deleteComment(String commentId) {
         Query query = new Query(Criteria.where("id").is(commentId));
-        mongoTemplate.remove(query, Comment.class);
+       var result= mongoTemplate.remove(query, MongoComment.class);
+        logger.info("Result: "+ result.toString());
     }
 }

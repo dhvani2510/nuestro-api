@@ -8,13 +8,19 @@ import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.util.FileCopyUtils;
 
 import javax.sql.DataSource;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.Objects;
 
 public class DatabaseHelper
 {
@@ -103,6 +109,68 @@ public class DatabaseHelper
             username = URLEncoder.encode(username, "UTF-8");
             password = URLEncoder.encode(password, "UTF-8");
             return String.format("mongodb://%s:%s@%s:%d/%s?authSource=admin", username, password, server, port, databaseName);
+        }
+    }
+
+//    private String getSqlScript( String scriptPath) {
+//
+//        Resource resource = new ClassPathResource(scriptPath);
+//        try (InputStream inputStream = resource.getInputStream()) {
+//            String sqlScript = new String(IOUtils.toByteArray(inputStream), StandardCharsets.UTF_8);
+//           return sqlScript;
+//        } catch (IOException e) {
+//           System.out.print(e.getMessage());
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
+
+
+    public static String loadSqlFileAsString(String filePath) {
+        try {
+            File file = new File(ClassLoader.getSystemClassLoader().getResource(filePath).getFile());
+            byte[] bytes = Files.readAllBytes(Paths.get(file.toURI()));
+            return new String(bytes);
+        } catch (IOException e) {
+            // Handle the exception (e.g., log it, throw a custom exception, etc.)
+            e.printStackTrace();
+            return null; // or throw a custom exception if appropriate
+        }
+    }
+
+
+    public static String loadQueryFromFile(String fileName) {
+        try {
+            Resource resource = new ClassPathResource(fileName);
+            StringBuilder queryBuilder = new StringBuilder();
+
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(
+                    Objects.requireNonNull(resource.getInputStream())))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    queryBuilder.append(line).append("\n");
+                }
+            }
+
+            return queryBuilder.toString();
+        } catch (IOException e) {
+            // Handle the exception (e.g., log it, throw a custom exception, etc.)
+            e.printStackTrace();
+            return null; // or throw a custom exception if appropriate
+        }
+    }
+
+    public static String readResourceFile(String filePath) {
+        try {
+            Resource resource = new ClassPathResource(filePath);
+
+            try (InputStreamReader reader = new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8)) {
+                return FileCopyUtils.copyToString(reader);
+            }
+        } catch (IOException e) {
+            // Handle the exception (e.g., log it, throw a custom exception, etc.)
+            e.printStackTrace();
+            return null; // or throw a custom exception if appropriate
         }
     }
 }

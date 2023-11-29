@@ -14,6 +14,7 @@ import com.example.nuestro.models.users.ProfileResponse;
 import com.example.nuestro.models.users.UpdateDatabaseRequest;
 import com.example.nuestro.repositories.UserRepository;
 import com.example.nuestro.shared.exceptions.NuestroException;
+import com.example.nuestro.shared.helpers.EncryptionHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 @Service
@@ -62,8 +64,11 @@ public class UserService {
         return result;
     }
     public List<User> GetAllUsers(){
-
         return userRepository.findAll();
+    }
+
+    public Optional<User> findByEmail(String email){
+        return userRepository.findByEmail(email);
     }
 
     public  UserModel GetProfile(String id) throws NuestroException {
@@ -74,7 +79,7 @@ public class UserService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-   public ProfileResponse UpdateProfile(ProfileRequest profileRequest) throws NuestroException, IOException {
+   public ProfileResponse UpdateProfile(ProfileRequest profileRequest) throws Exception {
        if(StringIsNullOrEmpty(profileRequest.getFirstName()))
            throw new NuestroException("First name is empty");
        if(StringIsNullOrEmpty(profileRequest.getLastName()))
@@ -93,7 +98,10 @@ public class UserService {
 
        user.setFirstName(profileRequest.getFirstName());
        user.setLastName( profileRequest.getLastName());
-       
+        if(user.getDatabaseType()!= DatabaseType.None){
+            var clientDatabase= clientService.getDatabase(user);
+            clientDatabase.updateUser(user);
+        }
        userRepository.save(user);
 
        logger.info("User profile updated");
@@ -123,21 +131,26 @@ public class UserService {
         //var user= (User)auth.getPrincipal();//var user= userRepository.findById(((User)auth.getPrincipal()))
         user.setUpdaterId(user.getCreatorId());
         user.setUpdatedAt(LocalDateTime.now());
-        user.Update(updateDatabaseRequest);
+        user.Update(updateDatabaseRequest); // Db info will be encrypted
         var clientDatabase= clientService.getDatabase(user);
-        var exists=clientDatabase.doesDatabaseExist(user.getDbDatabase());
+        var databaseName= EncryptionHelper.decrypt(user.getDbDatabase());
+        var exists=clientDatabase.doesDatabaseExist(databaseName);
         if(!clientDatabase.isConnectionValid()){
             throw  new NuestroException("Failed to connect to database. Check if database is created");
         }
         else{
-            clientDatabase.createDatabaseAndTables(user.getDbDatabase());
+            try{
+                clientDatabase.createDatabaseAndTables(databaseName);
+            }
+            catch (Exception e){
+                logger.error(e.getMessage());
+                throw  new NuestroException(e.getMessage());
+            };
         }
 
         clientDatabase.updateUser(user);
-
-        synchronizeService.synchronizeData(user.getId()); //synchornize
-
         userRepository.save(user);
+        synchronizeService.replicateData(user.getId()); //synchornize
         logger.info("Database updated");
         return new ProfileResponse(user);
     }
@@ -148,8 +161,10 @@ public class UserService {
                 .orElseThrow(()-> new NuestroException("User not find"));
         //post.setDeletedAt(LocalDateTime.now()) ; postRepository.save(post);
 
-        var clientDatabase= clientService.getDatabase(user);
-        clientDatabase.deleteUser(user.getId());
+        if(user.getDatabaseType()!= DatabaseType.None){
+            var clientDatabase= clientService.getDatabase(user);
+            clientDatabase.deleteUser(user.getId());
+        }
         userRepository.delete(user); //Synchonize
         logger.info("User deleted successfully");
     }
@@ -252,7 +267,6 @@ public class UserService {
                 .build();
     }
 
-
     @Transactional(rollbackFor = Exception.class)
     public  void Delete() throws Exception {
         logger.info("Deleting user");
@@ -262,12 +276,10 @@ public class UserService {
         if(!Objects.equals(userContext.getId(), user.getId()))
             throw  new NuestroException("Not authorized to delete another user");
 
-        //Synchonize?
-//        if(user.getDatabaseType()!=DatabaseType.None){
-//            var clientDatabase= clientService.getDatabase(user);
-//            clientDatabase.deleteUser(user.getId());
-//        }
-
+        if(user.getDatabaseType()!=DatabaseType.None){
+            var clientDatabase= clientService.getDatabase(user);
+            clientDatabase.deleteUser(user.getId());
+        }
         userRepository.delete(user);
         logger.info("User deleted successfully");
     }

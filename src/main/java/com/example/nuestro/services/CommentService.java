@@ -65,12 +65,12 @@ public class CommentService {
         var comment= new Comment(commentRequest.getComment(), user, post);
 
         //jdbcTemplate.setDataSource(userDataSource);
-
-        if(user.getDatabaseType()!= DatabaseType.None){
-           // var clientDatabase= clientService.getDatabase(user);
-            //clientDatabase.addComment(comment);
-        }
         commentRepository.save(comment); // Synchronize
+        if(user.getDatabaseType()!= DatabaseType.None){
+            var clientDatabase= clientService.getDatabase(user);
+            clientDatabase.addComment(comment);
+        }
+      logger.info("Comment added successfully");
         return  new CommentResponse(comment);
     }
 
@@ -81,15 +81,16 @@ public class CommentService {
         ValidateCommentRequest(commentRequest);
 
         var comment= commentRepository.findById(id)
-                .orElseThrow(()-> new NuestroException("Comment not find"));
+                .orElseThrow(()-> new NuestroException("Comment not found"));
 
         comment.Set(commentRequest);
         if(comment.getUser().getDatabaseType()!= DatabaseType.None){
-            //var user= userService.GetUser(comment.getUser().getId());
-            //var clientDatabase= clientService.getDatabase(user);
-            //clientDatabase.updatePost(comment);
+            var user= userService.GetUser(comment.getUser().getId());
+            var clientDatabase= clientService.getDatabase(user);
+            clientDatabase.updateComment(comment);
         }
         commentRepository.save(comment);//synchonize
+        logger.info("Comment updated succesfully");
         return new CommentResponse(comment);
     }
     @Transactional(rollbackFor = Exception.class)
@@ -98,9 +99,11 @@ public class CommentService {
         var comment= commentRepository.findById(id)
                 .orElseThrow(()-> new NuestroException("Comment not find"));
 
-       // var user= userService.GetUser(comment.getUser().getId());
-        //var clientDatabase= clientService.getDatabase(user);
-        //clientDatabase.deletePost(comment.getId());
+        if(comment.getUser().getDatabaseType()!= DatabaseType.None){
+            var user= comment.getUser(); //userService.GetUser(comment.getUser().getId());
+            var clientDatabase= clientService.getDatabase(user);
+            clientDatabase.deleteComment(comment.getId());
+        }
         commentRepository.delete(comment); //Synchonize
         logger.info("Comment deleted successfully");
     }

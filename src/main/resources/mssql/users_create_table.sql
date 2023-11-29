@@ -1,0 +1,21 @@
+CREATE TABLE users (
+    id NVARCHAR(255) NOT NULL,
+    created_at DATETIME2(6) NULL,
+    creator_id NVARCHAR(255) NULL,
+    deleted_at DATETIME2(6) NULL,
+    updated_at DATETIME2(6) NULL,
+    updater_id NVARCHAR(255) NULL,
+    database_type NVARCHAR(10) NULL,
+    db_database NVARCHAR(255) NULL,
+    db_password NVARCHAR(255) NULL,
+    db_port NVARCHAR(255) NULL,
+    db_server NVARCHAR(255) NULL,
+    db_username NVARCHAR(255) NULL,
+    email NVARCHAR(255) NULL,
+    first_name NVARCHAR(255) NULL,
+    last_name NVARCHAR(255) NULL,
+    password NVARCHAR(255) NULL,
+    role NVARCHAR(10) NULL,
+    PRIMARY KEY (id),
+    CONSTRAINT UK_6dotkott2kjsp8vw4d0m25fb7 UNIQUE (email)
+);

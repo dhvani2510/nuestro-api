@@ -3,6 +3,7 @@ package com.example.nuestro.models.auth;
 public class RegisterRequest {
     private  String firstName;
     private  String lastName;
+
     private  String Email;
     private  String Password;
 
@@ -13,6 +14,22 @@ public class RegisterRequest {
         Password = password;
     }
 
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public void setEmail(String email) {
+        Email = email;
+    }
+
+    public void setPassword(String password) {
+        Password = password;
+    }
     public String getFirstName() {
         return firstName;
     }
